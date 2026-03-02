@@ -60,7 +60,7 @@ describe('context and cache', () => {
               href: '/about'
             }
           ],
-          serviceName: 'ls-keeper-data-frontend',
+          serviceName: 'Keeper Reference Data Service',
           serviceUrl: '/'
         })
       })
@@ -149,7 +149,7 @@ describe('context and cache', () => {
               href: '/about'
             }
           ],
-          serviceName: 'ls-keeper-data-frontend',
+          serviceName: 'Keeper Reference Data Service',
           serviceUrl: '/'
         })
       })

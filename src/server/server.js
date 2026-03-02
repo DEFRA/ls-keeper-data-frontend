@@ -15,6 +15,8 @@ import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './common/helpers/content-security-policy.js'
 import { metrics } from '@defra/cdp-metrics'
+// import { defraIdAuth } from './common/helpers/auth/defra-id-auth.js'  // COMMENTED OUT: OAuth auth
+import { simpleAuth } from './common/helpers/auth/simple-auth.js' // ACTIVE: Simple username/password auth
 
 export async function createServer() {
   setupProxy()
@@ -61,6 +63,8 @@ export async function createServer() {
     secureContext,
     pulse,
     sessionCache,
+    // defraIdAuth,  // COMMENTED OUT: OAuth auth
+    simpleAuth, // ACTIVE: Simple username/password auth
     nunjucksConfig,
     Scooter,
     contentSecurityPolicy,
