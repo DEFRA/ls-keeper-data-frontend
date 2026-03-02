@@ -6,16 +6,12 @@ export const aboutController = {
   handler(_request, h) {
     return h.view('about/index', {
       pageTitle: 'About',
-      heading: 'About',
-      breadcrumbs: [
-        {
-          text: 'Home',
-          href: '/'
-        },
-        {
-          text: 'About'
-        }
-      ]
+      heading: 'About'
     })
+  },
+  options: {
+    auth: {
+      mode: 'try' // Allow both authenticated and unauthenticated access
+    }
   }
 }

@@ -19,7 +19,9 @@ describe('#aboutController', () => {
       url: '/about'
     })
 
-    expect(result).toEqual(expect.stringContaining('About |'))
+    expect(result).toEqual(
+      expect.stringContaining('About | Keeper Reference Data Service')
+    )
     expect(statusCode).toBe(statusCodes.ok)
   })
 })

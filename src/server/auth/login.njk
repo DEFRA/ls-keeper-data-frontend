@@ -1,0 +1,75 @@
+{% extends 'layouts/page.njk' %}
+
+{% set pageTitle = 'Sign In' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      
+      {% if error %}
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+          <div role="alert">
+            <h2 class="govuk-error-summary__title">
+              There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+              <ul class="govuk-list govuk-error-summary__list">
+                <li>
+                  <a href="#username">{{ error }}</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+      
+      <p class="govuk-body">
+        Sign in to access the {{ serviceName }}
+      </p>
+
+      <form method="post" action="/auth/login" novalidate>
+        
+        <div class="govuk-form-group {% if error %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="username">
+            Username
+          </label>
+          {% if error %}
+            <p id="username-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ error }}
+            </p>
+          {% endif %}
+          <input 
+            class="govuk-input {% if error %}govuk-input--error{% endif %}" 
+            id="username" 
+            name="username" 
+            type="text" 
+            value="{{ username }}"
+            {% if error %}aria-describedby="username-error"{% endif %}
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label" for="password">
+            Password
+          </label>
+          <input 
+            class="govuk-input" 
+            id="password" 
+            name="password" 
+            type="password"
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button class="govuk-button" type="submit" data-module="govuk-button">
+          Sign in
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

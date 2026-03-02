@@ -1,12 +1,22 @@
 /**
  * A GDS styled example home page controller.
- * Provided as an example, remove or modify as required.
+ * Updated to work with simple username/password authentication.
  */
 export const homeController = {
-  handler(_request, h) {
+  handler(request, h) {
+    // Get user from simple auth session
+    const user = request.auth.isAuthenticated ? request.auth.credentials : null
+
     return h.view('home/index', {
       pageTitle: 'Home',
-      heading: 'Home'
+      heading: 'KRDS Dashboard',
+      user: user || null,
+      isAuthenticated: request.auth.isAuthenticated
     })
+  },
+  options: {
+    auth: {
+      mode: 'try' // Allow both authenticated and unauthenticated access
+    }
   }
 }
