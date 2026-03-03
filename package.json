@@ -101,6 +101,7 @@
     "webpack-cli": "4.10.0"
   },
   "overrides": {
-    "tmp": "0.2.5"
+    "tmp": "0.2.5",
+    "serialize-javascript": "^7.0.3"
   }
 }
