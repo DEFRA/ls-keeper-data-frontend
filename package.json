@@ -78,7 +78,7 @@
     "babel-loader": "8.4.1",
     "cheerio": "1.1.2",
     "clean-webpack-plugin": "4.0.0",
-    "copy-webpack-plugin": "14.0.0",
+    "copy-webpack-plugin": "5.1.2",
     "eslint": "9.39.2",
     "husky": "9.1.7",
     "neostandard": "0.12.2",
@@ -95,7 +95,7 @@
     "terser-webpack-plugin": "5.3.16",
     "vitest": "4.0.16",
     "vitest-fetch-mock": "0.4.5",
-    "webpack": "5.105.3",
+    "webpack": "4.25.1",
     "webpack-assets-manifest": "3.1.1",
     "webpack-cli": "4.10.0"
   },
