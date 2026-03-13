@@ -73,11 +73,11 @@ export const auth = {
             }),
             failAction: (request, h, error) => {
               const formErrors = {}
-              
+
               error.details.forEach((detail) => {
                 formErrors[detail.path[0]] = detail.message
               })
-              
+
               request.yar.flash('formErrors', formErrors)
               request.yar.flash('username', request.payload?.username || '')
               return h.redirect('/auth/login').takeover()
