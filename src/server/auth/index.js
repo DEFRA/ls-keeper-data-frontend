@@ -15,11 +15,11 @@ export const auth = {
             return h.redirect('/')
           }
 
-          const error = request.yar.flash('loginError')[0]
+          const formErrors = request.yar.flash('formErrors')[0] || {}
           const username = request.yar.flash('username')[0] || ''
 
           return h.view('auth/login', {
-            error,
+            formErrors,
             username
           })
         },
@@ -42,7 +42,9 @@ export const auth = {
 
           if (!user) {
             // Authentication failed
-            request.yar.flash('loginError', 'Invalid username or password')
+            request.yar.flash('formErrors', {
+              username: 'Invalid username or password'
+            })
             request.yar.flash('username', username)
             return h.redirect('/auth/login')
           }
@@ -60,14 +62,24 @@ export const auth = {
           },
           validate: {
             payload: joi.object({
-              username: joi.string().required(),
-              password: joi.string().required()
+              username: joi.string().required().messages({
+                'any.required': 'Enter your username',
+                'string.empty': 'Enter your username'
+              }),
+              password: joi.string().required().messages({
+                'any.required': 'Enter your password',
+                'string.empty': 'Enter your password'
+              })
             }),
             failAction: (request, h, error) => {
-              request.yar.flash(
-                'loginError',
-                'Username and password are required'
-              )
+              const formErrors = {}
+              
+              error.details.forEach((detail) => {
+                formErrors[detail.path[0]] = detail.message
+              })
+              
+              request.yar.flash('formErrors', formErrors)
+              request.yar.flash('username', request.payload?.username || '')
               return h.redirect('/auth/login').takeover()
             }
           }
