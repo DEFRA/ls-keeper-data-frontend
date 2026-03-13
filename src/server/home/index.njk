@@ -20,17 +20,17 @@
               <h3 class="govuk-notification-banner__heading">
                 Welcome, {{ user.displayName }}!
               </h3>
-              <p class="govuk-body">You are successfully authenticated with DEFRA ID.</p>
+              <p class="govuk-body">You are successfully authenticated!</p>
             </div>
           </div>
           
-          <p class="govuk-body"><strong>User Details:</strong></p>
+          {# <p class="govuk-body"><strong>User Details:</strong></p>
           <ul class="govuk-list govuk-list--bullet">
             <li><strong>Email:</strong> {{ user.email }}</li>
             <li><strong>Contact ID:</strong> {{ user.contactId }}</li>
             <li><strong>Service ID:</strong> {{ user.serviceId }}</li>
             <li><strong>Enrolments:</strong> {{ user.enrolmentCount }}</li>
-          </ul>
+          </ul> #}
           
           <div class="govuk-button-group">
             <a href="/auth/profile" class="govuk-button govuk-button--secondary">View Profile</a>
