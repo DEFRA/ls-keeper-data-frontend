@@ -5,6 +5,10 @@ import { about } from './about/index.js'
 import { health } from './health/index.js'
 import { auth } from './auth/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
+import { dataTools } from './data-tools/index.js'
+import { ingestion } from './ingestion/index.js'
+import { dataQuality } from './data-quality/index.js'
+import { systemMaintenance } from './system-maintenance/index.js'
 
 export const router = {
   plugin: {
@@ -20,6 +24,9 @@ export const router = {
 
       // Application specific routes, add your own routes here
       await server.register([home, about])
+
+      // Feature routes
+      await server.register([dataTools, ingestion, dataQuality, systemMaintenance])
 
       // Static assets
       await server.register([serveStaticFiles])
