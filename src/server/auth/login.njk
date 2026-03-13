@@ -6,7 +6,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       
-      {% if error %}
+      {% if formErrors.username or formErrors.password %}
         <div class="govuk-error-summary" data-module="govuk-error-summary">
           <div role="alert">
             <h2 class="govuk-error-summary__title">
@@ -14,9 +14,16 @@
             </h2>
             <div class="govuk-error-summary__body">
               <ul class="govuk-list govuk-error-summary__list">
-                <li>
-                  <a href="#username">{{ error }}</a>
-                </li>
+                {% if formErrors.username %}
+                  <li>
+                    <a href="#username">{{ formErrors.username }}</a>
+                  </li>
+                {% endif %}
+                {% if formErrors.password %}
+                  <li>
+                    <a href="#password">{{ formErrors.password }}</a>
+                  </li>
+                {% endif %}
               </ul>
             </div>
           </div>
@@ -31,35 +38,41 @@
 
       <form method="post" action="/auth/login" novalidate>
         
-        <div class="govuk-form-group {% if error %}govuk-form-group--error{% endif %}">
+        <div class="govuk-form-group {% if formErrors.username %}govuk-form-group--error{% endif %}">
           <label class="govuk-label" for="username">
             Username
           </label>
-          {% if error %}
+          {% if formErrors.username %}
             <p id="username-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ error }}
+              <span class="govuk-visually-hidden">Error:</span> {{ formErrors.username }}
             </p>
           {% endif %}
           <input 
-            class="govuk-input {% if error %}govuk-input--error{% endif %}" 
+            class="govuk-input {% if formErrors.username %}govuk-input--error{% endif %}" 
             id="username" 
             name="username" 
             type="text" 
             value="{{ username }}"
-            {% if error %}aria-describedby="username-error"{% endif %}
+            {% if formErrors.username %}aria-describedby="username-error"{% endif %}
             autocomplete="username"
           >
         </div>
 
-        <div class="govuk-form-group">
+        <div class="govuk-form-group {% if formErrors.password %}govuk-form-group--error{% endif %}">
           <label class="govuk-label" for="password">
             Password
           </label>
+          {% if formErrors.password %}
+            <p id="password-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ formErrors.password }}
+            </p>
+          {% endif %}
           <input 
-            class="govuk-input" 
+            class="govuk-input {% if formErrors.password %}govuk-input--error{% endif %}" 
             id="password" 
             name="password" 
             type="password"
+            {% if formErrors.password %}aria-describedby="password-error"{% endif %}
             autocomplete="current-password"
           >
         </div>
