@@ -256,16 +256,24 @@ export const config = convict({
       default: 'http://localhost:5555',
       env: 'KEEPER_DATA_API_BASE_URL'
     },
+    authHeader: {
+      doc: 'Keeper Data API base64-encoded auth credentials (takes precedence over username/password)',
+      format: String,
+      nullable: true,
+      default: null,
+      env: 'KEEPER_DATA_API_AUTH_HEADER',
+      sensitive: true
+    },
     username: {
-      doc: 'Keeper Data API basic auth username',
+      doc: 'Keeper Data API basic auth username (fallback if authHeader not provided)',
       format: String,
       default: 'ApiKey',
       env: 'KEEPER_DATA_API_USERNAME'
     },
     password: {
-      doc: 'Keeper Data API basic auth password (base64-encoded credentials)',
+      doc: 'Keeper Data API basic auth password (fallback if authHeader not provided)',
       format: String,
-      default: 'QXBpS2V5OmludGVncmF0aW9uLXRlc3Qtc2VjcmV0',
+      default: 'integration-test-secret',
       env: 'KEEPER_DATA_API_PASSWORD',
       sensitive: true
     }
