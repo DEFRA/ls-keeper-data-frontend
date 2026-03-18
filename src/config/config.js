@@ -263,9 +263,9 @@ export const config = convict({
       env: 'KEEPER_DATA_API_USERNAME'
     },
     password: {
-      doc: 'Keeper Data API basic auth password',
+      doc: 'Keeper Data API basic auth password (base64-encoded credentials)',
       format: String,
-      default: 'integration-test-secret',
+      default: 'QXBpS2V5OmludGVncmF0aW9uLXRlc3Qtc2VjcmV0',
       env: 'KEEPER_DATA_API_PASSWORD',
       sensitive: true
     }

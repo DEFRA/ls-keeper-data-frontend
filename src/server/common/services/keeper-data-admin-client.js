@@ -5,17 +5,10 @@ import { createLogger } from '../helpers/logging/logger.js'
 const logger = createLogger()
 
 function buildAdminAuthHeader() {
-  const username = config.get('keeperDataApi.username')
+  // Use password directly as base64-encoded credentials
+  // (assumes password contains the base64 value, we prepend "Basic ")
   const password = config.get('keeperDataApi.password')
-
-  // If password is already a complete Basic auth header, use it directly
-  if (password.startsWith('Basic ')) {
-    return password
-  }
-
-  // Otherwise construct from username:password
-  const credentials = `${username}:${password}`
-  return `Basic ${Buffer.from(credentials).toString('base64')}`
+  return `Basic ${password}`
 }
 
 async function adminApiGet(path, queryParams = {}) {
