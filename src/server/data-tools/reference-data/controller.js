@@ -26,7 +26,11 @@ function buildPagination(page, totalPages, request) {
     const isEdge = i === 1 || i === totalPages
 
     if (isEdge || nearCurrent) {
-      items.push({ number: i, href: buildPageUrl(request, i), current: i === page })
+      items.push({
+        number: i,
+        href: buildPageUrl(request, i),
+        current: i === page
+      })
       seen.add(i)
     }
   }
@@ -41,7 +45,8 @@ function buildPagination(page, totalPages, request) {
 
   return {
     previous: page > 1 ? { href: buildPageUrl(request, page - 1) } : undefined,
-    next: page < totalPages ? { href: buildPageUrl(request, page + 1) } : undefined,
+    next:
+      page < totalPages ? { href: buildPageUrl(request, page + 1) } : undefined,
     items: withEllipsis
   }
 }
@@ -51,18 +56,31 @@ export const referenceDataController = {
     const query = request.query
     const activeType = VALID_TYPES.includes(query.type) ? query.type : 'sites'
     const page = Math.max(1, parseInt(query.page, 10) || 1)
-    const pageSize = Math.min(50, Math.max(1, parseInt(query.pageSize, 10) || DEFAULT_PAGE_SIZE))
+    const pageSize = Math.min(
+      50,
+      Math.max(1, parseInt(query.pageSize, 10) || DEFAULT_PAGE_SIZE)
+    )
 
     let result = null
     let error = null
 
     const hasFilters =
       (activeType === 'sites' &&
-        (query.siteIdentifier || query.siteType || query.keeperPartyId || query.lastUpdatedDate)) ||
+        (query.siteIdentifier ||
+          query.siteType ||
+          query.keeperPartyId ||
+          query.lastUpdatedDate)) ||
       (activeType === 'parties' &&
-        (query.firstName || query.lastName || query.email || query.lastUpdatedDate)) ||
+        (query.firstName ||
+          query.lastName ||
+          query.email ||
+          query.lastUpdatedDate)) ||
       (activeType === 'countries' &&
-        (query.name || query.code || query.devolvedAuthority || query.euTradeMember || query.lastUpdatedDate))
+        (query.name ||
+          query.code ||
+          query.devolvedAuthority ||
+          query.euTradeMember ||
+          query.lastUpdatedDate))
 
     if (hasFilters || query.page) {
       try {
@@ -101,7 +119,9 @@ export const referenceDataController = {
       }
     }
 
-    const totalPages = result ? Math.ceil((result.totalCount || 0) / pageSize) : 0
+    const totalPages = result
+      ? Math.ceil((result.totalCount || 0) / pageSize)
+      : 0
 
     return h.view('data-tools/reference-data/index', {
       pageTitle: 'Reference Data',

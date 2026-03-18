@@ -7,7 +7,12 @@ export const dataTools = {
   plugin: {
     name: 'data-tools',
     async register(server) {
-      await server.register([referenceData, collectionQuery, sourceFiles, recordIdGenerator])
+      await server.register([
+        referenceData,
+        collectionQuery,
+        sourceFiles,
+        recordIdGenerator
+      ])
     }
   }
 }

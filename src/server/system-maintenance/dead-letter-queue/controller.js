@@ -58,7 +58,10 @@ export const peekMessagesController = {
 
 export const redriveMessagesController = {
   async handler(request, h) {
-    const maxMessages = Number.parseInt(request.payload?.maxMessages || '10', 10)
+    const maxMessages = Number.parseInt(
+      request.payload?.maxMessages || '10',
+      10
+    )
 
     try {
       const result = await redriveDeadLetterMessages(maxMessages)

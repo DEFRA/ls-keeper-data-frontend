@@ -16,7 +16,15 @@ export const collectionQueryController = {
     const { collection, $filter, $orderby, $select, $skip, $top, $count } =
       request.query
 
-    const filters = { collection, $filter, $orderby, $select, $skip, $top, $count }
+    const filters = {
+      collection,
+      $filter,
+      $orderby,
+      $select,
+      $skip,
+      $top,
+      $count
+    }
     const hasQuery = Boolean(collection)
 
     let result = null

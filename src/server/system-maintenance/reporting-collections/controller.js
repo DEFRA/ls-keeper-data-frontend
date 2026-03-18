@@ -7,7 +7,10 @@ export const reportingCollectionsController = {
       breadcrumbs: [
         { text: 'Home', href: '/' },
         { text: 'System Maintenance', href: '/system-maintenance/collections' },
-        { text: 'Reporting Collections', href: '/system-maintenance/reporting-collections' }
+        {
+          text: 'Reporting Collections',
+          href: '/system-maintenance/reporting-collections'
+        }
       ]
     })
   }

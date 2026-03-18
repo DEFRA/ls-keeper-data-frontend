@@ -10,9 +10,7 @@ export const homeController = {
     return h.view('home/index', {
       pageTitle: 'Home',
       heading: 'KRDS Dashboard',
-      breadcrumbs: [
-        { text: 'Home', href: '/' }
-      ],
+      breadcrumbs: [{ text: 'Home', href: '/' }],
       user: user || null,
       isAuthenticated: request.auth.isAuthenticated
     })

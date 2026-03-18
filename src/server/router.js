@@ -26,7 +26,12 @@ export const router = {
       await server.register([home, about])
 
       // Feature routes
-      await server.register([dataTools, ingestion, dataQuality, systemMaintenance])
+      await server.register([
+        dataTools,
+        ingestion,
+        dataQuality,
+        systemMaintenance
+      ])
 
       // Static assets
       await server.register([serveStaticFiles])
