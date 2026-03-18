@@ -44,7 +44,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'ls-keeper-data-frontend'
+    default: 'Keeper Reference Data Service'
   },
   root: {
     doc: 'Project root',

@@ -20,7 +20,7 @@ describe('#aboutController', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('About | ls-keeper-data-frontend')
+      expect.stringContaining('About | Keeper Reference Data Service')
     )
     expect(statusCode).toBe(statusCodes.ok)
   })

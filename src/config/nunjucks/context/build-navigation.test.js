@@ -28,14 +28,19 @@ describe('#buildNavigation', () => {
   test('Should provide expected navigation details', () => {
     expect(
       buildNavigation(
-        mockRequest({ path: '/non-existent-path', auth: { isAuthenticated: true } })
+        mockRequest({
+          path: '/non-existent-path',
+          auth: { isAuthenticated: true }
+        })
       )
     ).toEqual(allNavItems())
   })
 
   test('Should mark Home as current when on the home path', () => {
     expect(
-      buildNavigation(mockRequest({ path: '/', auth: { isAuthenticated: true } }))
+      buildNavigation(
+        mockRequest({ path: '/', auth: { isAuthenticated: true } })
+      )
     ).toEqual(allNavItems({ Home: true }))
   })
 
@@ -61,7 +66,10 @@ describe('#buildNavigation', () => {
   test('Should mark Ingestion as current when on an ingestion path', () => {
     expect(
       buildNavigation(
-        mockRequest({ path: '/ingestion/pipeline', auth: { isAuthenticated: true } })
+        mockRequest({
+          path: '/ingestion/pipeline',
+          auth: { isAuthenticated: true }
+        })
       )
     ).toEqual(allNavItems({ Ingestion: true }))
   })
