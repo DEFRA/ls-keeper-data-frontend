@@ -49,16 +49,12 @@ describe('context and cache', () => {
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
-            {
-              current: true,
-              text: 'Home',
-              href: '/'
-            },
-            {
-              current: false,
-              text: 'About',
-              href: '/about'
-            }
+            { current: true, text: 'Home', href: '/' },
+            { current: false, text: 'About', href: '/about' },
+            { current: false, text: 'Data Tools', href: '/data-tools/reference-data' },
+            { current: false, text: 'Ingestion', href: '/ingestion/pipeline' },
+            { current: false, text: 'Data Quality', href: '/data-quality/analysis-runs' },
+            { current: false, text: 'System Maintenance', href: '/system-maintenance/collections' }
           ],
           serviceName: 'Keeper Reference Data Service',
           serviceUrl: '/'
@@ -138,16 +134,12 @@ describe('context and cache', () => {
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
-            {
-              current: true,
-              text: 'Home',
-              href: '/'
-            },
-            {
-              current: false,
-              text: 'About',
-              href: '/about'
-            }
+            { current: true, text: 'Home', href: '/' },
+            { current: false, text: 'About', href: '/about' },
+            { current: false, text: 'Data Tools', href: '/data-tools/reference-data' },
+            { current: false, text: 'Ingestion', href: '/ingestion/pipeline' },
+            { current: false, text: 'Data Quality', href: '/data-quality/analysis-runs' },
+            { current: false, text: 'System Maintenance', href: '/system-maintenance/collections' }
           ],
           serviceName: 'Keeper Reference Data Service',
           serviceUrl: '/'

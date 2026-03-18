@@ -1,5 +1,7 @@
 export function buildNavigation(request) {
-  return [
+  const isAuthenticated = request?.auth?.isAuthenticated
+
+  const publicNav = [
     {
       text: 'Home',
       href: '/',
@@ -9,6 +11,14 @@ export function buildNavigation(request) {
       text: 'About',
       href: '/about',
       current: request?.path === '/about'
+    }
+  ]
+
+  const authenticatedNav = [
+    {
+      text: 'Home',
+      href: '/',
+      current: request?.path === '/'
     },
     {
       text: 'Data Tools',
@@ -29,6 +39,13 @@ export function buildNavigation(request) {
       text: 'System Maintenance',
       href: '/system-maintenance/collections',
       current: request?.path?.startsWith('/system-maintenance')
+    },
+    {
+      text: 'About',
+      href: '/about',
+      current: request?.path === '/about'
     }
   ]
+
+  return isAuthenticated ? authenticatedNav : publicNav
 }

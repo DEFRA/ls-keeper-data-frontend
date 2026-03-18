@@ -1,16 +1,101 @@
 {% extends 'layouts/page.njk' %}
 
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
 {% block content %}
   {{ appHeading({
     text: heading,
     caption: caption
   }) }}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
-        <p class="govuk-body">Content coming soon.</p>
+  {% if error %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{ text: error }]
+    }) }}
+  {% endif %}
+
+  <form method="GET" action="/data-tools/collection-query">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
+        {{ govukInput({
+          label: { text: "Collection name", classes: "govuk-label--s" },
+          hint: { text: "The OData entity set name, e.g. Sites, Parties" },
+          id: "collection",
+          name: "collection",
+          value: filters.collection,
+          classes: "govuk-input--width-30"
+        }) }}
       </div>
     </div>
-  </div>
+    <details class="govuk-details govuk-!-margin-bottom-4">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">OData query options</span>
+      </summary>
+      <div class="govuk-details__text">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-half">
+            {{ govukInput({ label: { text: "$filter" }, id: "$filter", name: "$filter", value: filters["$filter"], classes: "govuk-input--width-30" }) }}
+            {{ govukInput({ label: { text: "$orderby" }, id: "$orderby", name: "$orderby", value: filters["$orderby"], classes: "govuk-input--width-30" }) }}
+            {{ govukInput({ label: { text: "$select" }, id: "$select", name: "$select", value: filters["$select"], classes: "govuk-input--width-30" }) }}
+          </div>
+          <div class="govuk-grid-column-one-half">
+            {{ govukInput({ label: { text: "$skip" }, id: "$skip", name: "$skip", value: filters["$skip"], classes: "govuk-input--width-10" }) }}
+            {{ govukInput({ label: { text: "$top" }, id: "$top", name: "$top", value: filters["$top"], classes: "govuk-input--width-10" }) }}
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="govuk-button-group">
+      {{ govukButton({ text: "Query" }) }}
+      {% if hasQuery %}
+        <a class="govuk-link" href="/data-tools/collection-query">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if hasQuery and result %}
+    {% if result.value and result.value.length > 0 %}
+      <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-4">
+        {% if result.count is not undefined %}
+          Showing <strong>{{ result.value.length }}</strong> of <strong>{{ result.count }}</strong> records
+        {% else %}
+          Returned <strong>{{ result.value.length }}</strong> records
+        {% endif %}
+      </p>
+      <div class="govuk-!-overflow-hidden" style="overflow-x: auto;">
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              {% for col in dynamicColumns %}
+                <th class="govuk-table__header govuk-!-font-size-16">{{ col }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for row in result.value %}
+              <tr class="govuk-table__row">
+                {% for col in dynamicColumns %}
+                  <td class="govuk-table__cell govuk-!-font-size-16">
+                    {% if row[col] is not string and row[col] is not number and row[col] is not null %}
+                      <code>{{ row[col] | dump }}</code>
+                    {% else %}
+                      {{ row[col] if row[col] is not null else '—' }}
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      {{ govukInsetText({ text: "No records returned for this query." }) }}
+    {% endif %}
+  {% elif not hasQuery %}
+    {{ govukInsetText({ text: "Enter a collection name above and run a query to see results." }) }}
+  {% endif %}
 {% endblock %}

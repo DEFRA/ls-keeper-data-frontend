@@ -1,4 +1,7 @@
-import { recordIdGeneratorController } from './controller.js'
+import {
+  recordIdGeneratorGetController,
+  recordIdGeneratorPostController
+} from './controller.js'
 
 export const recordIdGenerator = {
   plugin: {
@@ -8,7 +11,12 @@ export const recordIdGenerator = {
         {
           method: 'GET',
           path: '/data-tools/record-id-generator',
-          ...recordIdGeneratorController
+          ...recordIdGeneratorGetController
+        },
+        {
+          method: 'POST',
+          path: '/data-tools/record-id-generator',
+          ...recordIdGeneratorPostController
         }
       ])
     }

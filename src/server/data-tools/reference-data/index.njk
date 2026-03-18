@@ -1,16 +1,237 @@
 {% extends 'layouts/page.njk' %}
 
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% macro resultsCount(result) %}
+  <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-4">
+    Showing <strong>{{ result.values.length }}</strong> of <strong>{{ result.totalCount }}</strong> results
+  </p>
+{% endmacro %}
+
 {% block content %}
   {{ appHeading({
     text: heading,
     caption: caption
   }) }}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
-        <p class="govuk-body">Content coming soon.</p>
-      </div>
+  {% if error %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{ text: error }]
+    }) }}
+  {% endif %}
+
+  <div class="govuk-tabs">
+    <ul class="govuk-tabs__list">
+      <li class="govuk-tabs__list-item{% if activeType === 'sites' %} govuk-tabs__list-item--selected{% endif %}">
+        <a class="govuk-tabs__tab" href="/data-tools/reference-data?type=sites">Sites</a>
+      </li>
+      <li class="govuk-tabs__list-item{% if activeType === 'parties' %} govuk-tabs__list-item--selected{% endif %}">
+        <a class="govuk-tabs__tab" href="/data-tools/reference-data?type=parties">Parties</a>
+      </li>
+      <li class="govuk-tabs__list-item{% if activeType === 'countries' %} govuk-tabs__list-item--selected{% endif %}">
+        <a class="govuk-tabs__tab" href="/data-tools/reference-data?type=countries">Countries</a>
+      </li>
+    </ul>
+
+    {# ── Sites panel ──────────────────────────────────────────────── #}
+    <div class="govuk-tabs__panel{% if activeType !== 'sites' %} govuk-tabs__panel--hidden{% endif %}" id="sites">
+      <h2 class="govuk-heading-m">Sites</h2>
+      <form method="GET" action="/data-tools/reference-data">
+        <input type="hidden" name="type" value="sites">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Site identifier" }, id: "siteIdentifier", name: "siteIdentifier", value: filters.siteIdentifier, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Type" }, id: "siteType", name: "siteType", value: filters.siteType, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Keeper party ID" }, id: "keeperPartyId", name: "keeperPartyId", value: filters.keeperPartyId, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Last updated from" }, id: "lastUpdatedDate", name: "lastUpdatedDate", value: filters.lastUpdatedDate, classes: "govuk-input--width-20", attributes: { placeholder: "2024-01-01" } }) }}
+          </div>
+        </div>
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Search" }) }}
+          {% if hasFilters %}<a class="govuk-link" href="/data-tools/reference-data?type=sites">Clear filters</a>{% endif %}
+        </div>
+      </form>
+
+      {% if activeType === 'sites' %}
+        {% if result and result.values and result.values.length > 0 %}
+          {{ resultsCount(result) }}
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th class="govuk-table__header">ID</th>
+                <th class="govuk-table__header">Name</th>
+                <th class="govuk-table__header">State</th>
+                <th class="govuk-table__header">Type</th>
+                <th class="govuk-table__header">Source</th>
+                <th class="govuk-table__header">Last updated</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for s in result.values %}
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><code>{{ s.id }}</code></td>
+                  <td class="govuk-table__cell">{{ s.name or '—' }}</td>
+                  <td class="govuk-table__cell">{{ s.state or '—' }}</td>
+                  <td class="govuk-table__cell">{{ s.type.code if s.type else '—' }}</td>
+                  <td class="govuk-table__cell">{{ s.source or '—' }}</td>
+                  <td class="govuk-table__cell">{{ s.lastUpdatedDate | formatDate('dd MMM yyyy') if s.lastUpdatedDate else '—' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% if pagination %}{{ govukPagination(pagination) }}{% endif %}
+        {% elif result and result.values.length === 0 %}
+          {{ govukInsetText({ text: "No sites found matching the search criteria." }) }}
+        {% else %}
+          {{ govukInsetText({ text: "Use the filters above to search for sites." }) }}
+        {% endif %}
+      {% endif %}
+    </div>
+
+    {# ── Parties panel ────────────────────────────────────────────── #}
+    <div class="govuk-tabs__panel{% if activeType !== 'parties' %} govuk-tabs__panel--hidden{% endif %}" id="parties">
+      <h2 class="govuk-heading-m">Parties</h2>
+      <form method="GET" action="/data-tools/reference-data">
+        <input type="hidden" name="type" value="parties">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "First name" }, id: "firstName", name: "firstName", value: filters.firstName, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Last name" }, id: "lastName", name: "lastName", value: filters.lastName, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Email" }, id: "email", name: "email", value: filters.email, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Last updated from" }, id: "lastUpdatedDate", name: "lastUpdatedDate", value: filters.lastUpdatedDate, classes: "govuk-input--width-20", attributes: { placeholder: "2024-01-01" } }) }}
+          </div>
+        </div>
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Search" }) }}
+          {% if hasFilters %}<a class="govuk-link" href="/data-tools/reference-data?type=parties">Clear filters</a>{% endif %}
+        </div>
+      </form>
+
+      {% if activeType === 'parties' %}
+        {% if result and result.values and result.values.length > 0 %}
+          {{ resultsCount(result) }}
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th class="govuk-table__header">ID</th>
+                <th class="govuk-table__header">First name</th>
+                <th class="govuk-table__header">Last name</th>
+                <th class="govuk-table__header">Customer no.</th>
+                <th class="govuk-table__header">Party type</th>
+                <th class="govuk-table__header">State</th>
+                <th class="govuk-table__header">Last updated</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for p in result.values %}
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><code>{{ p.id }}</code></td>
+                  <td class="govuk-table__cell">{{ p.firstName or '—' }}</td>
+                  <td class="govuk-table__cell">{{ p.lastName or '—' }}</td>
+                  <td class="govuk-table__cell">{{ p.customerNumber or '—' }}</td>
+                  <td class="govuk-table__cell">{{ p.partyType or '—' }}</td>
+                  <td class="govuk-table__cell">{{ p.state or '—' }}</td>
+                  <td class="govuk-table__cell">{{ p.lastUpdatedDate | formatDate('dd MMM yyyy') if p.lastUpdatedDate else '—' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% if pagination %}{{ govukPagination(pagination) }}{% endif %}
+        {% elif result and result.values.length === 0 %}
+          {{ govukInsetText({ text: "No parties found matching the search criteria." }) }}
+        {% else %}
+          {{ govukInsetText({ text: "Use the filters above to search for parties." }) }}
+        {% endif %}
+      {% endif %}
+    </div>
+
+    {# ── Countries panel ──────────────────────────────────────────── #}
+    <div class="govuk-tabs__panel{% if activeType !== 'countries' %} govuk-tabs__panel--hidden{% endif %}" id="countries">
+      <h2 class="govuk-heading-m">Countries</h2>
+      <form method="GET" action="/data-tools/reference-data">
+        <input type="hidden" name="type" value="countries">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Name" }, id: "name", name: "name", value: filters.name, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukInput({ label: { text: "Code" }, id: "code", name: "code", value: filters.code, classes: "govuk-input--width-20" }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukSelect({ label: { text: "Devolved authority" }, id: "devolvedAuthority", name: "devolvedAuthority", items: [
+              { value: "", text: "Any" },
+              { value: "true", text: "Yes", selected: filters.devolvedAuthority === 'true' },
+              { value: "false", text: "No", selected: filters.devolvedAuthority === 'false' }
+            ] }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukSelect({ label: { text: "EU trade member" }, id: "euTradeMember", name: "euTradeMember", items: [
+              { value: "", text: "Any" },
+              { value: "true", text: "Yes", selected: filters.euTradeMember === 'true' },
+              { value: "false", text: "No", selected: filters.euTradeMember === 'false' }
+            ] }) }}
+          </div>
+        </div>
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Search" }) }}
+          {% if hasFilters %}<a class="govuk-link" href="/data-tools/reference-data?type=countries">Clear filters</a>{% endif %}
+        </div>
+      </form>
+
+      {% if activeType === 'countries' %}
+        {% if result and result.values and result.values.length > 0 %}
+          {{ resultsCount(result) }}
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th class="govuk-table__header">Code</th>
+                <th class="govuk-table__header">Name</th>
+                <th class="govuk-table__header">Long name</th>
+                <th class="govuk-table__header">EU trade member</th>
+                <th class="govuk-table__header">Devolved authority</th>
+                <th class="govuk-table__header">Active</th>
+                <th class="govuk-table__header">Last modified</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for c in result.values %}
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><code>{{ c.code }}</code></td>
+                  <td class="govuk-table__cell">{{ c.name }}</td>
+                  <td class="govuk-table__cell">{{ c.longName or '—' }}</td>
+                  <td class="govuk-table__cell">{{ 'Yes' if c.euTradeMember else 'No' }}</td>
+                  <td class="govuk-table__cell">{{ 'Yes' if c.devolvedAuthority else 'No' }}</td>
+                  <td class="govuk-table__cell">{{ 'Yes' if c.isActive else 'No' }}</td>
+                  <td class="govuk-table__cell">{{ c.lastModifiedDate | formatDate('dd MMM yyyy') if c.lastModifiedDate else '—' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% if pagination %}{{ govukPagination(pagination) }}{% endif %}
+        {% elif result and result.values.length === 0 %}
+          {{ govukInsetText({ text: "No countries found matching the search criteria." }) }}
+        {% else %}
+          {{ govukInsetText({ text: "Use the filters above to search for countries." }) }}
+        {% endif %}
+      {% endif %}
     </div>
   </div>
 {% endblock %}

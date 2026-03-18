@@ -1,4 +1,7 @@
-import { sourceFilesController } from './controller.js'
+import {
+  sourceFilesGetController,
+  sourceFilesPostController
+} from './controller.js'
 
 export const sourceFiles = {
   plugin: {
@@ -8,7 +11,12 @@ export const sourceFiles = {
         {
           method: 'GET',
           path: '/data-tools/source-files',
-          ...sourceFilesController
+          ...sourceFilesGetController
+        },
+        {
+          method: 'POST',
+          path: '/data-tools/source-files',
+          ...sourceFilesPostController
         }
       ])
     }
