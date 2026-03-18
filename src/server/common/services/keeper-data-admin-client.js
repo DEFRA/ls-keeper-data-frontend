@@ -5,8 +5,8 @@ import { createLogger } from '../helpers/logging/logger.js'
 const logger = createLogger()
 
 function buildAdminAuthHeader() {
-  const username = config.get('keeperDataApi.admin.username')
-  const password = config.get('keeperDataApi.admin.password')
+  const username = config.get('keeperDataApi.username')
+  const password = config.get('keeperDataApi.password')
   const credentials = `${username}:${password}`
   return `Basic ${Buffer.from(credentials).toString('base64')}`
 }

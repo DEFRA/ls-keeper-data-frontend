@@ -72,6 +72,12 @@ export const config = convict({
     format: Boolean,
     default: isTest
   },
+  appBaseUrl: {
+    doc: 'Application base URL for OAuth redirect URI (required for DEFRA ID authentication)',
+    format: String,
+    default: 'http://localhost:3000',
+    env: 'APP_BASE_URL'
+  },
   log: {
     enabled: {
       doc: 'Is logging enabled',
@@ -253,30 +259,15 @@ export const config = convict({
     username: {
       doc: 'Keeper Data API basic auth username',
       format: String,
-      default: 'admin',
+      default: 'ApiKey',
       env: 'KEEPER_DATA_API_USERNAME'
     },
     password: {
       doc: 'Keeper Data API basic auth password',
       format: String,
-      default: 'changeme123',
+      default: 'integration-test-secret',
       env: 'KEEPER_DATA_API_PASSWORD',
       sensitive: true
-    },
-    admin: {
-      username: {
-        doc: 'Keeper Data API admin endpoints auth username',
-        format: String,
-        default: 'ApiKey',
-        env: 'KEEPER_DATA_API_ADMIN_USERNAME'
-      },
-      password: {
-        doc: 'Keeper Data API admin endpoints auth password',
-        format: String,
-        default: 'integration-test-secret',
-        env: 'KEEPER_DATA_API_ADMIN_PASSWORD',
-        sensitive: true
-      }
     }
   },
   keeperDataBridge: {

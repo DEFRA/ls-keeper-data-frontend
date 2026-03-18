@@ -1,0 +1,216 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    caption: caption
+  }) }}
+
+  {% if error %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [
+        {
+          text: error
+        }
+      ]
+    }) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      
+      <p class="govuk-body">
+        The Dead Letter Queue (DLQ) contains messages that failed to process in the data ingestion pipeline.
+        Use this page to monitor failed messages and take corrective action.
+      </p>
+
+      {% if queueStats %}
+        <h2 class="govuk-heading-m">Queue Statistics</h2>
+        
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Messages available
+            </dt>
+            <dd class="govuk-summary-list__value">
+              <strong class="govuk-tag govuk-tag--{{ 'red' if queueStats.approximateNumberOfMessages > 0 else 'green' }}">
+                {{ queueStats.approximateNumberOfMessages }}
+              </strong>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Messages in flight
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ queueStats.approximateNumberOfMessagesNotVisible }}
+            </dd>
+          </div>
+        </dl>
+
+        {% if queueStats.approximateNumberOfMessages > 0 %}
+          <h2 class="govuk-heading-m">Actions</h2>
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Peek at messages",
+              id: "peek-messages-btn",
+              classes: "govuk-button--secondary"
+            }) }}
+
+            {{ govukButton({
+              text: "Redrive messages",
+              id: "redrive-messages-btn",
+              classes: "govuk-button--warning"
+            }) }}
+          </div>
+
+          <div id="messages-container" style="display: none; margin-top: 2rem;">
+            <h3 class="govuk-heading-s">Messages</h3>
+            <div id="messages-content"></div>
+          </div>
+
+          <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+          <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+              <span class="govuk-warning-text__assistive">Warning</span>
+              Danger Zone
+            </strong>
+          </div>
+
+          <h2 class="govuk-heading-m">Purge All Messages</h2>
+          
+          <p class="govuk-body">
+            This will permanently delete all messages from the dead letter queue. 
+            <strong>This action cannot be undone.</strong>
+          </p>
+
+          {{ govukButton({
+            text: "Purge queue",
+            id: "purge-queue-btn",
+            classes: "govuk-button--warning"
+          }) }}
+
+        {% else %}
+          <p class="govuk-body govuk-!-margin-top-6">
+            <strong class="govuk-tag govuk-tag--green">Queue is empty</strong>
+          </p>
+          <p class="govuk-body">
+            There are no messages in the dead letter queue. The ingestion pipeline is processing messages successfully.
+          </p>
+        {% endif %}
+
+      {% endif %}
+
+    </div>
+  </div>
+
+  <script nonce="{{ cspNonce }}">
+    (function() {
+      const peekBtn = document.getElementById('peek-messages-btn');
+      const redriveBtn = document.getElementById('redrive-messages-btn');
+      const purgeBtn = document.getElementById('purge-queue-btn');
+      const messagesContainer = document.getElementById('messages-container');
+      const messagesContent = document.getElementById('messages-content');
+
+      if (peekBtn) {
+        peekBtn.addEventListener('click', async function() {
+          peekBtn.disabled = true;
+          peekBtn.textContent = 'Loading...';
+
+          try {
+            const response = await fetch('/system-maintenance/dead-letter-queue/peek?maxMessages=5');
+            const data = await response.json();
+
+            if (response.ok) {
+              messagesContainer.style.display = 'block';
+              messagesContent.innerHTML = `
+                <p class="govuk-body"><strong>Found ${data.count} message(s)</strong></p>
+                <pre style="background: #f3f2f1; padding: 1rem; overflow-x: auto; font-size: 0.875rem;">${JSON.stringify(data.messages, null, 2)}</pre>
+              `;
+            } else {
+              alert('Failed to peek messages: ' + (data.message || 'Unknown error'));
+            }
+          } catch (err) {
+            alert('Error: ' + err.message);
+          } finally {
+            peekBtn.disabled = false;
+            peekBtn.textContent = 'Peek at messages';
+          }
+        });
+      }
+
+      if (redriveBtn) {
+        redriveBtn.addEventListener('click', async function() {
+          if (!confirm('Redrive up to 10 messages back to the main queue for reprocessing?')) {
+            return;
+          }
+
+          redriveBtn.disabled = true;
+          redriveBtn.textContent = 'Processing...';
+
+          try {
+            const response = await fetch('/system-maintenance/dead-letter-queue/redrive', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ maxMessages: 10 })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+              alert(`Redrive completed!\n\nProcessed: ${data.processedCount}\nSuccessful: ${data.successCount}\nFailed: ${data.failureCount}`);
+              window.location.reload();
+            } else {
+              alert('Failed to redrive messages: ' + (data.message || 'Unknown error'));
+            }
+          } catch (err) {
+            alert('Error: ' + err.message);
+          } finally {
+            redriveBtn.disabled = false;
+            redriveBtn.textContent = 'Redrive messages';
+          }
+        });
+      }
+
+      if (purgeBtn) {
+        purgeBtn.addEventListener('click', async function() {
+          if (!confirm('⚠️ WARNING: This will PERMANENTLY DELETE all messages from the dead letter queue.\n\nThis action CANNOT be undone.\n\nAre you sure you want to continue?')) {
+            return;
+          }
+
+          purgeBtn.disabled = true;
+          purgeBtn.textContent = 'Purging...';
+
+          try {
+            const response = await fetch('/system-maintenance/dead-letter-queue/purge', {
+              method: 'POST'
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+              alert('Queue purged successfully!');
+              window.location.reload();
+            } else {
+              alert('Failed to purge queue: ' + (data.message || 'Unknown error'));
+            }
+          } catch (err) {
+            alert('Error: ' + err.message);
+          } finally {
+            purgeBtn.disabled = false;
+            purgeBtn.textContent = 'Purge queue';
+          }
+        });
+      }
+    })();
+  </script>
+{% endblock %}
