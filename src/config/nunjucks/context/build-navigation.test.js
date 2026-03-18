@@ -7,7 +7,6 @@ function mockRequest(options) {
 const allNavItems = (overrides = {}) =>
   [
     { text: 'Home', href: '/', current: false },
-    { text: 'About', href: '/about', current: false },
     { text: 'Data Tools', href: '/data-tools/reference-data', current: false },
     { text: 'Ingestion', href: '/ingestion/pipeline', current: false },
     {
@@ -19,7 +18,8 @@ const allNavItems = (overrides = {}) =>
       text: 'System Maintenance',
       href: '/system-maintenance/collections',
       current: false
-    }
+    },
+    { text: 'About', href: '/about', current: false }
   ].map((item) =>
     item.text in overrides ? { ...item, current: overrides[item.text] } : item
   )
@@ -27,43 +27,64 @@ const allNavItems = (overrides = {}) =>
 describe('#buildNavigation', () => {
   test('Should provide expected navigation details', () => {
     expect(
-      buildNavigation(mockRequest({ path: '/non-existent-path' }))
+      buildNavigation(
+        mockRequest({ path: '/non-existent-path', auth: { isAuthenticated: true } })
+      )
     ).toEqual(allNavItems())
   })
 
   test('Should mark Home as current when on the home path', () => {
-    expect(buildNavigation(mockRequest({ path: '/' }))).toEqual(
-      allNavItems({ Home: true })
-    )
+    expect(
+      buildNavigation(mockRequest({ path: '/', auth: { isAuthenticated: true } }))
+    ).toEqual(allNavItems({ Home: true }))
   })
 
   test('Should mark About as current when on the about path', () => {
-    expect(buildNavigation(mockRequest({ path: '/about' }))).toEqual(
-      allNavItems({ About: true })
-    )
+    expect(
+      buildNavigation(
+        mockRequest({ path: '/about', auth: { isAuthenticated: true } })
+      )
+    ).toEqual(allNavItems({ About: true }))
   })
 
   test('Should mark Data Tools as current when on a data-tools path', () => {
     expect(
-      buildNavigation(mockRequest({ path: '/data-tools/reference-data' }))
+      buildNavigation(
+        mockRequest({
+          path: '/data-tools/reference-data',
+          auth: { isAuthenticated: true }
+        })
+      )
     ).toEqual(allNavItems({ 'Data Tools': true }))
   })
 
   test('Should mark Ingestion as current when on an ingestion path', () => {
     expect(
-      buildNavigation(mockRequest({ path: '/ingestion/pipeline' }))
+      buildNavigation(
+        mockRequest({ path: '/ingestion/pipeline', auth: { isAuthenticated: true } })
+      )
     ).toEqual(allNavItems({ Ingestion: true }))
   })
 
   test('Should mark Data Quality as current when on a data-quality path', () => {
     expect(
-      buildNavigation(mockRequest({ path: '/data-quality/issues' }))
+      buildNavigation(
+        mockRequest({
+          path: '/data-quality/issues',
+          auth: { isAuthenticated: true }
+        })
+      )
     ).toEqual(allNavItems({ 'Data Quality': true }))
   })
 
   test('Should mark System Maintenance as current when on a system-maintenance path', () => {
     expect(
-      buildNavigation(mockRequest({ path: '/system-maintenance/storage' }))
+      buildNavigation(
+        mockRequest({
+          path: '/system-maintenance/storage',
+          auth: { isAuthenticated: true }
+        })
+      )
     ).toEqual(allNavItems({ 'System Maintenance': true }))
   })
 })

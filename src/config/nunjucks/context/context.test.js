@@ -23,7 +23,7 @@ describe('context and cache', () => {
   })
 
   describe('#context', () => {
-    const mockRequest = { path: '/' }
+    const mockRequest = { path: '/', auth: { isAuthenticated: true } }
 
     describe('When webpack manifest file read succeeds', () => {
       let contextImport
@@ -49,14 +49,21 @@ describe('context and cache', () => {
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
-            { current: true, text: 'Home', href: '/' },
-            { current: false, text: 'About', href: '/about' },
+            {
+              current: true,
+              text: 'Home',
+              href: '/'
+            },
             {
               current: false,
               text: 'Data Tools',
               href: '/data-tools/reference-data'
             },
-            { current: false, text: 'Ingestion', href: '/ingestion/pipeline' },
+            {
+              current: false,
+              text: 'Ingestion',
+              href: '/ingestion/pipeline'
+            },
             {
               current: false,
               text: 'Data Quality',
@@ -66,9 +73,14 @@ describe('context and cache', () => {
               current: false,
               text: 'System Maintenance',
               href: '/system-maintenance/collections'
+            },
+            {
+              current: false,
+              text: 'About',
+              href: '/about'
             }
           ],
-          serviceName: 'Keeper Reference Data Service',
+          serviceName: 'ls-keeper-data-frontend',
           serviceUrl: '/'
         })
       })
@@ -112,7 +124,7 @@ describe('context and cache', () => {
   })
 
   describe('#context cache', () => {
-    const mockRequest = { path: '/' }
+    const mockRequest = { path: '/', auth: { isAuthenticated: true } }
     let contextResult
 
     describe('Webpack manifest file cache', () => {
@@ -146,14 +158,21 @@ describe('context and cache', () => {
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
-            { current: true, text: 'Home', href: '/' },
-            { current: false, text: 'About', href: '/about' },
+            {
+              current: true,
+              text: 'Home',
+              href: '/'
+            },
             {
               current: false,
               text: 'Data Tools',
               href: '/data-tools/reference-data'
             },
-            { current: false, text: 'Ingestion', href: '/ingestion/pipeline' },
+            {
+              current: false,
+              text: 'Ingestion',
+              href: '/ingestion/pipeline'
+            },
             {
               current: false,
               text: 'Data Quality',
@@ -163,9 +182,14 @@ describe('context and cache', () => {
               current: false,
               text: 'System Maintenance',
               href: '/system-maintenance/collections'
+            },
+            {
+              current: false,
+              text: 'About',
+              href: '/about'
             }
           ],
-          serviceName: 'Keeper Reference Data Service',
+          serviceName: 'ls-keeper-data-frontend',
           serviceUrl: '/'
         })
       })

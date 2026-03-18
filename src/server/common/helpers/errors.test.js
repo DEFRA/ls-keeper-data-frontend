@@ -23,7 +23,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Page not found | Keeper Reference Data Service')
+      expect.stringContaining('Page not found | ls-keeper-data-frontend')
     )
     expect(statusCode).toBe(statusCodes.notFound)
   })
