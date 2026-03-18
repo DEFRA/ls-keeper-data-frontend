@@ -7,6 +7,13 @@ const logger = createLogger()
 function buildAdminAuthHeader() {
   const username = config.get('keeperDataApi.username')
   const password = config.get('keeperDataApi.password')
+
+  // If password is already a complete Basic auth header, use it directly
+  if (password.startsWith('Basic ')) {
+    return password
+  }
+
+  // Otherwise construct from username:password
   const credentials = `${username}:${password}`
   return `Basic ${Buffer.from(credentials).toString('base64')}`
 }
