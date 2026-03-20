@@ -207,7 +207,6 @@
                 <th class="govuk-table__header">Long name</th>
                 <th class="govuk-table__header">EU trade member</th>
                 <th class="govuk-table__header">Devolved authority</th>
-                <th class="govuk-table__header">Active</th>
                 <th class="govuk-table__header">Last modified</th>
               </tr>
             </thead>
@@ -217,10 +216,9 @@
                   <td class="govuk-table__cell"><code>{{ c.code }}</code></td>
                   <td class="govuk-table__cell">{{ c.name }}</td>
                   <td class="govuk-table__cell">{{ c.longName or '—' }}</td>
-                  <td class="govuk-table__cell">{{ 'Yes' if c.euTradeMember else 'No' }}</td>
-                  <td class="govuk-table__cell">{{ 'Yes' if c.devolvedAuthority else 'No' }}</td>
-                  <td class="govuk-table__cell">{{ 'Yes' if c.isActive else 'No' }}</td>
-                  <td class="govuk-table__cell">{{ c.lastModifiedDate | formatDate('dd MMM yyyy') if c.lastModifiedDate else '—' }}</td>
+                  <td class="govuk-table__cell">{{ 'Yes' if c.euTradeMemberFlag else 'No' }}</td>
+                  <td class="govuk-table__cell">{{ 'Yes' if c.devolvedAuthorityFlag else 'No' }}</td>
+                  <td class="govuk-table__cell">{{ c.lastUpdatedDate | formatDate('dd MMM yyyy') if c.lastUpdatedDate else '—' }}</td>
                 </tr>
               {% endfor %}
             </tbody>
