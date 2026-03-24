@@ -92,7 +92,7 @@ export async function getDeadLetterQueueCount() {
  * @returns {Promise<{messages: Array, count: number}>}
  */
 export async function getDeadLetterMessages(maxMessages = 5) {
-  return adminApiGet('/api/admin/queues/deadletter/messages', { maxMessages })
+  return adminApiGet('/api/admin/queues/deadletter/peek', { maxMessages })
 }
 
 /**

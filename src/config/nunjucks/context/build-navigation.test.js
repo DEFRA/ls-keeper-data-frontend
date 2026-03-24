@@ -16,7 +16,7 @@ const allNavItems = (overrides = {}) =>
     },
     {
       text: 'System Maintenance',
-      href: '/system-maintenance/collections',
+      href: '/system-maintenance',
       current: false
     },
     { text: 'About', href: '/about', current: false }
