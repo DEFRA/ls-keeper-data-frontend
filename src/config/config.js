@@ -1,17 +1,8 @@
-import 'dotenv/config'
 import convict from 'convict'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import convictFormatWithValidator from 'convict-format-with-validator'
-
-// Debug: Check if environment variables are loaded
-console.log('🔧 Environment Variables Debug:', {
-  NODE_ENV: process.env.NODE_ENV,
-  AUTH_USERNAME: process.env.AUTH_USERNAME,
-  AUTH_PASSWORD: process.env.AUTH_PASSWORD,
-  AUTH_SERVICE_NAME: process.env.AUTH_SERVICE_NAME
-})
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -80,6 +71,12 @@ export const config = convict({
     doc: 'If this application running in the test environment',
     format: Boolean,
     default: isTest
+  },
+  appBaseUrl: {
+    doc: 'Application base URL for OAuth redirect URI (required for DEFRA ID authentication)',
+    format: String,
+    default: 'http://localhost:3000',
+    env: 'APP_BASE_URL'
   },
   log: {
     enabled: {
@@ -203,136 +200,6 @@ export const config = convict({
       env: 'REDIS_TLS'
     }
   },
-  appBaseUrl: {
-    doc: 'Application base URL for after we signIn',
-    format: String,
-    default: 'http://localhost:3000',
-    env: 'APP_BASE_URL'
-  },
-  auth: {
-    defraId: {
-      oidcConfigurationUrl: {
-        doc: 'DEFRA ID OIDC Configuration URL',
-        format: String,
-        default:
-          'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration',
-        env: 'AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL'
-      },
-      redirectUri: {
-        doc: 'DEFRA ID Redirect URI',
-        format: String,
-        default: 'http://localhost:3000/signin-oidc',
-        env: 'AUTH_DEFRA_ID_REDIRECT_URI'
-      },
-      clientId: {
-        doc: 'DEFRA ID Client ID',
-        format: String,
-        default: '63983fc2-cfff-45bb-8ec2-959e21062b9a',
-        env: 'AUTH_DEFRA_ID_CLIENT_ID'
-      },
-      clientSecret: {
-        doc: 'DEFRA ID Client Secret',
-        format: String,
-        default: 'test_value',
-        env: 'AUTH_DEFRA_ID_CLIENT_SECRET',
-        sensitive: true
-      },
-      serviceId: {
-        doc: 'DEFRA ID Service ID',
-        format: String,
-        default: 'd7d72b79-9c62-ee11-8df0-000d3adf7047',
-        env: 'AUTH_DEFRA_ID_SERVICE_ID'
-      },
-      scopes: {
-        doc: 'DEFRA ID OAuth scopes',
-        format: Array,
-        default: ['openid', 'offline_access'],
-        env: 'AUTH_DEFRA_ID_SCOPES'
-      },
-      organisations: {
-        doc: 'DEFRA ID allowed organisations',
-        format: Array,
-        default: [],
-        env: 'AUTH_DEFRA_ID_ORGANISATIONS'
-      }
-    },
-    // Future providers can be added here:
-    // entraId: {
-    //   oidcConfigurationUrl: {
-    //     doc: 'Entra ID OIDC Configuration URL',
-    //     format: String,
-    //     env: 'AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL',
-    //     default: 'https://login.microsoftonline.com/{tenant}/v2.0/.well-known/openid-configuration'
-    //   },
-    //   clientId: {
-    //     doc: 'Entra ID Client ID',
-    //     format: String,
-    //     env: 'AUTH_ENTRA_ID_CLIENT_ID',
-    //     default: ''
-    //   },
-    //   clientSecret: {
-    //     doc: 'Entra ID Client Secret',
-    //     format: String,
-    //     sensitive: true,
-    //     env: 'AUTH_ENTRA_ID_CLIENT_SECRET',
-    //     default: ''
-    //   },
-    //   scopes: {
-    //     doc: 'Entra ID OAuth scopes',
-    //     format: Array,
-    //     default: ['openid', 'offline_access'],
-    //     env: 'AUTH_ENTRA_ID_SCOPES'
-    //   },
-    //   groups: {
-    //     doc: 'Entra ID user groups',
-    //     format: Array,
-    //     default: [],
-    //     env: 'AUTH_ENTRA_ID_SECURITY_GROUPS'
-    //   },
-    //   adminGroupId: {
-    //     doc: 'Entra ID admin security group identifier',
-    //     format: String,
-    //     default: '',
-    //     env: 'AUTH_ENTRA_ID_ADMIN_GROUP_ID'
-    //   }
-    // },
-
-    // Simple username/password authentication (ACTIVE)
-    simple: {
-      enabled: {
-        doc: 'Enable simple username/password authentication',
-        format: Boolean,
-        default: true,
-        env: 'AUTH_SIMPLE_ENABLED'
-      },
-      username: {
-        doc: 'Authentication username',
-        format: String,
-        env: 'AUTH_USERNAME',
-        default: 'admin',
-        sensitive: true
-      },
-      password: {
-        doc: 'Authentication password',
-        format: String,
-        env: 'AUTH_PASSWORD',
-        default: 'changeme123',
-        sensitive: true
-      },
-      serviceName: {
-        doc: 'Service display name for sessions',
-        format: String,
-        default: 'LS Keeper Data Frontend',
-        env: 'AUTH_SERVICE_NAME'
-      }
-    },
-
-    origins: {
-      doc: 'Auth provider origins for CSP header',
-      format: Array,
-      default: []
-    }
-  },
   nunjucks: {
     watch: {
       doc: 'Reload templates when they are changed.',
@@ -351,6 +218,72 @@ export const config = convict({
       format: String,
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
+    }
+  },
+  auth: {
+    simple: {
+      enabled: {
+        doc: 'Enable simple username/password authentication',
+        format: Boolean,
+        default: true,
+        env: 'AUTH_SIMPLE_ENABLED'
+      },
+      username: {
+        doc: 'Simple auth username',
+        format: String,
+        default: 'admin',
+        env: 'AUTH_USERNAME'
+      },
+      password: {
+        doc: 'Simple auth password',
+        format: String,
+        default: 'changeme',
+        env: 'AUTH_PASSWORD',
+        sensitive: true
+      },
+      serviceName: {
+        doc: 'Service name for authentication display',
+        format: String,
+        default: 'LS Keeper Data Frontend',
+        env: 'AUTH_SERVICE_NAME'
+      }
+    }
+  },
+  keeperDataApi: {
+    baseUrl: {
+      doc: 'Keeper Data API base URL',
+      format: String,
+      default: 'http://localhost:5555',
+      env: 'KEEPER_DATA_API_BASE_URL'
+    },
+    authHeader: {
+      doc: 'Keeper Data API base64-encoded auth credentials (takes precedence over username/password)',
+      format: String,
+      nullable: true,
+      default: null,
+      env: 'KEEPER_DATA_API_AUTH_HEADER',
+      sensitive: true
+    },
+    username: {
+      doc: 'Keeper Data API basic auth username (fallback if authHeader not provided)',
+      format: String,
+      default: 'ApiKey',
+      env: 'KEEPER_DATA_API_USERNAME'
+    },
+    password: {
+      doc: 'Keeper Data API basic auth password (fallback if authHeader not provided)',
+      format: String,
+      default: 'integration-test-secret',
+      env: 'KEEPER_DATA_API_PASSWORD',
+      sensitive: true
+    }
+  },
+  keeperDataBridge: {
+    baseUrl: {
+      doc: 'Keeper Data Bridge backend base URL',
+      format: String,
+      default: 'http://localhost:5560',
+      env: 'KEEPER_DATA_BRIDGE_BASE_URL'
     }
   }
 })

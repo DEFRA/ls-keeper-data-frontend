@@ -1,0 +1,109 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    caption: caption
+  }) }}
+
+  {# ── Catalogue Browser ─────────────────────────────────────── #}
+  <h2 class="govuk-heading-m">Catalogue browser</h2>
+  <p class="govuk-body govuk-!-color-secondary">Browse files available in the external catalogue by source type and time window.</p>
+
+  {% if catalogueError %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{ text: catalogueError }]
+    }) }}
+  {% endif %}
+
+  <form method="GET" action="/data-tools/source-files">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-quarter">
+        {{ govukSelect({
+          label: { text: "Source type", classes: "govuk-label--s" },
+          id: "sourceType",
+          name: "sourceType",
+          items: [
+            { value: "internal", text: "Internal", selected: filters.sourceType === "internal" },
+            { value: "external", text: "External", selected: filters.sourceType === "external" }
+          ]
+        }) }}
+      </div>
+      <div class="govuk-grid-column-one-quarter">
+        {{ govukInput({
+          label: { text: "Days", classes: "govuk-label--s" },
+          hint: { text: "Number of days to look back" },
+          id: "days",
+          name: "days",
+          value: filters.days,
+          classes: "govuk-input--width-5",
+          inputmode: "numeric"
+        }) }}
+      </div>
+    </div>
+    <div class="govuk-button-group">
+      {{ govukButton({ text: "Browse", classes: "govuk-button--secondary" }) }}
+      {% if hasQuery %}
+        <a class="govuk-link" href="/data-tools/source-files">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if hasQuery %}
+    {% if catalogueResult %}
+      <pre class="govuk-body govuk-!-font-size-16" style="background:#f3f2f1;padding:1rem;overflow-x:auto;white-space:pre-wrap;word-break:break-all;">{{ catalogueResult }}</pre>
+    {% else %}
+      {{ govukInsetText({ text: "No catalogue files returned for the selected parameters." }) }}
+    {% endif %}
+  {% endif %}
+
+  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+  {# ── Raw File Upload ───────────────────────────────────────── #}
+  <h2 class="govuk-heading-m">Raw file upload</h2>
+  <p class="govuk-body govuk-!-color-secondary">Upload a raw file to the external catalogue by specifying an object key and file content.</p>
+
+  {% if uploadSuccess %}
+    {{ govukNotificationBanner({
+      type: "success",
+      titleText: "Upload successful",
+      html: "<p class=\"govuk-body\">" + uploadSuccess + "</p>"
+    }) }}
+  {% endif %}
+
+  {% if uploadError %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{ text: uploadError }]
+    }) }}
+  {% endif %}
+
+  <form method="POST" action="/data-tools/source-files">
+    {{ govukInput({
+      label: { text: "Object key", classes: "govuk-label--s" },
+      hint: { text: "The S3 object key for the file, e.g. feeds/my-file.xml" },
+      id: "objectKey",
+      name: "objectKey",
+      value: uploadPayload.objectKey if uploadPayload else "",
+      classes: "govuk-input--width-30"
+    }) }}
+    {{ govukTextarea({
+      label: { text: "File content", classes: "govuk-label--s" },
+      hint: { text: "Paste the raw file content here" },
+      id: "content",
+      name: "content",
+      value: uploadPayload.content if uploadPayload else "",
+      rows: 10
+    }) }}
+    {{ govukButton({ text: "Upload file" }) }}
+  </form>
+{% endblock %}

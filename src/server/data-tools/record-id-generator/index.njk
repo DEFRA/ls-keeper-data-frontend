@@ -1,0 +1,57 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    caption: caption
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">Generate a deterministic record ID from one or more key parts. Enter each key part on a new line.</p>
+
+      {% if error %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: [{ text: error }]
+        }) }}
+      {% endif %}
+
+      {% if generatedId %}
+        {{ govukPanel({
+          titleText: "Record ID generated",
+          html: "<code style='font-size:1.1em;word-break:break-all;'>" + generatedId + "</code>"
+        }) }}
+
+        <h2 class="govuk-heading-s govuk-!-margin-top-4">Key parts used</h2>
+        <ul class="govuk-list govuk-list--bullet">
+          {% for part in keyPartsUsed %}
+            <li><code>{{ part }}</code></li>
+          {% endfor %}
+        </ul>
+
+        <p class="govuk-body">
+          <a class="govuk-link" href="/data-tools/record-id-generator">Generate another</a>
+        </p>
+      {% else %}
+        <form method="POST" action="/data-tools/record-id-generator">
+          {{ govukTextarea({
+            label: { text: "Key parts", classes: "govuk-label--s" },
+            hint: { text: "One key part per line" },
+            id: "keyParts",
+            name: "keyParts",
+            value: keyPartsInput,
+            rows: 6
+          }) }}
+          {{ govukButton({ text: "Generate record ID" }) }}
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
