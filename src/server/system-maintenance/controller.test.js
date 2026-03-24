@@ -27,7 +27,9 @@ describe('#systemMaintenanceController', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('System Maintenance | Keeper Reference Data Service')
+      expect.stringContaining(
+        'System Maintenance | Keeper Reference Data Service'
+      )
     )
     expect(statusCode).toBe(statusCodes.ok)
   })

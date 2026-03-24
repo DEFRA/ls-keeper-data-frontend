@@ -27,7 +27,10 @@ export const deadLetterQueueController = {
       breadcrumbs: [
         { text: 'Home', href: '/' },
         { text: 'System Maintenance', href: '/system-maintenance' },
-        { text: 'Dead Letter Queue', href: '/system-maintenance/dead-letter-queue' }
+        {
+          text: 'Dead Letter Queue',
+          href: '/system-maintenance/dead-letter-queue'
+        }
       ],
       queueStats,
       error
