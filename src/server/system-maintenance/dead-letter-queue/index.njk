@@ -13,6 +13,13 @@
     caption: caption
   }) }}
 
+  {% if successMessage %}
+    {{ govukNotificationBanner({
+      type: "success",
+      html: '<p class="govuk-notification-banner__heading">' + successMessage + '</p>'
+    }) }}
+  {% endif %}
+
   {% if error %}
     {{ govukErrorSummary({
       titleText: "There is a problem",
@@ -59,24 +66,38 @@
         {% if queueStats.approximateNumberOfMessages > 0 %}
           <h2 class="govuk-heading-m">Actions</h2>
 
+          <p class="govuk-body">
+            <strong>Peek:</strong> View up to 10 messages without removing them from the queue.
+          </p>
+          <p class="govuk-body">
+            <strong>Redrive:</strong> Process up to 10 messages by moving them back to the main queue for reprocessing.
+          </p>
+
           <div class="govuk-button-group">
-            {{ govukButton({
-              text: "Peek at messages",
-              id: "peek-messages-btn",
-              classes: "govuk-button--secondary"
-            }) }}
+            <a href="/system-maintenance/dead-letter-queue?action=peek&maxMessages=5" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+              Peek at messages
+            </a>
 
-            {{ govukButton({
-              text: "Redrive messages",
-              id: "redrive-messages-btn",
-              classes: "govuk-button--warning"
-            }) }}
+            <form method="POST" action="/system-maintenance/dead-letter-queue/redrive" style="display: inline;">
+              <input type="hidden" name="maxMessages" value="10">
+              {{ govukButton({
+                text: "Redrive messages",
+                classes: "govuk-button--warning",
+                attributes: {
+                  onclick: "return confirm('Redrive up to 10 messages back to the main queue for reprocessing?')"
+                }
+              }) }}
+            </form>
           </div>
 
-          <div id="messages-container" style="display: none; margin-top: 2rem;">
-            <h3 class="govuk-heading-s">Messages</h3>
-            <div id="messages-content"></div>
-          </div>
+          {% if messages %}
+            <div class="govuk-!-margin-top-6">
+              <h3 class="govuk-heading-s">Messages</h3>
+              <p class="govuk-body"><strong>Found {{ messages.count }} message(s)</strong></p>
+              <pre style="background: #f3f2f1; padding: 1rem; overflow-x: auto; font-size: 0.875rem;">{{ messages.messages | dump(2) }}</pre>
+              <a href="/system-maintenance/dead-letter-queue" class="govuk-button govuk-button--secondary govuk-!-margin-top-4">Hide messages</a>
+            </div>
+          {% endif %}
 
           <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
@@ -91,15 +112,19 @@
           <h2 class="govuk-heading-m">Purge All Messages</h2>
           
           <p class="govuk-body">
-            This will permanently delete all messages from the dead letter queue. 
+            This will permanently delete <strong>all messages</strong> from the dead letter queue (not just 10). 
             <strong>This action cannot be undone.</strong>
           </p>
 
-          {{ govukButton({
-            text: "Purge queue",
-            id: "purge-queue-btn",
-            classes: "govuk-button--warning"
-          }) }}
+          <form method="POST" action="/system-maintenance/dead-letter-queue/purge">
+            {{ govukButton({
+              text: "Purge queue",
+              classes: "govuk-button--warning",
+              attributes: {
+                onclick: "return confirm('WARNING: This will PERMANENTLY DELETE all messages from the dead letter queue.\\n\\nThis action CANNOT be undone.\\n\\nAre you sure you want to continue?')"
+              }
+            }) }}
+          </form>
 
         {% else %}
           <p class="govuk-body govuk-!-margin-top-6">
@@ -114,103 +139,4 @@
 
     </div>
   </div>
-
-  <script nonce="{{ cspNonce }}">
-    (function() {
-      const peekBtn = document.getElementById('peek-messages-btn');
-      const redriveBtn = document.getElementById('redrive-messages-btn');
-      const purgeBtn = document.getElementById('purge-queue-btn');
-      const messagesContainer = document.getElementById('messages-container');
-      const messagesContent = document.getElementById('messages-content');
-
-      if (peekBtn) {
-        peekBtn.addEventListener('click', async function() {
-          peekBtn.disabled = true;
-          peekBtn.textContent = 'Loading...';
-
-          try {
-            const response = await fetch('/system-maintenance/dead-letter-queue/peek?maxMessages=5');
-            const data = await response.json();
-
-            if (response.ok) {
-              messagesContainer.style.display = 'block';
-              messagesContent.innerHTML = `
-                <p class="govuk-body"><strong>Found ${data.count} message(s)</strong></p>
-                <pre style="background: #f3f2f1; padding: 1rem; overflow-x: auto; font-size: 0.875rem;">${JSON.stringify(data.messages, null, 2)}</pre>
-              `;
-            } else {
-              alert('Failed to peek messages: ' + (data.message || 'Unknown error'));
-            }
-          } catch (err) {
-            alert('Error: ' + err.message);
-          } finally {
-            peekBtn.disabled = false;
-            peekBtn.textContent = 'Peek at messages';
-          }
-        });
-      }
-
-      if (redriveBtn) {
-        redriveBtn.addEventListener('click', async function() {
-          if (!confirm('Redrive up to 10 messages back to the main queue for reprocessing?')) {
-            return;
-          }
-
-          redriveBtn.disabled = true;
-          redriveBtn.textContent = 'Processing...';
-
-          try {
-            const response = await fetch('/system-maintenance/dead-letter-queue/redrive', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ maxMessages: 10 })
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-              alert(`Redrive completed!\n\nProcessed: ${data.processedCount}\nSuccessful: ${data.successCount}\nFailed: ${data.failureCount}`);
-              window.location.reload();
-            } else {
-              alert('Failed to redrive messages: ' + (data.message || 'Unknown error'));
-            }
-          } catch (err) {
-            alert('Error: ' + err.message);
-          } finally {
-            redriveBtn.disabled = false;
-            redriveBtn.textContent = 'Redrive messages';
-          }
-        });
-      }
-
-      if (purgeBtn) {
-        purgeBtn.addEventListener('click', async function() {
-          if (!confirm('⚠️ WARNING: This will PERMANENTLY DELETE all messages from the dead letter queue.\n\nThis action CANNOT be undone.\n\nAre you sure you want to continue?')) {
-            return;
-          }
-
-          purgeBtn.disabled = true;
-          purgeBtn.textContent = 'Purging...';
-
-          try {
-            const response = await fetch('/system-maintenance/dead-letter-queue/purge', {
-              method: 'POST'
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-              alert('Queue purged successfully!');
-              window.location.reload();
-            } else {
-              alert('Failed to purge queue: ' + (data.message || 'Unknown error'));
-            }
-          } catch (err) {
-            alert('Error: ' + err.message);
-          } finally {
-            purgeBtn.disabled = false;
-            purgeBtn.textContent = 'Purge queue';
-          }
-        });
-      }
-    })();
-  </script>
 {% endblock %}

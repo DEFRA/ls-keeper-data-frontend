@@ -9,14 +9,38 @@ import { createLogger } from '../../common/helpers/logging/logger.js'
 const logger = createLogger()
 
 export const deadLetterQueueController = {
-  async handler(_request, h) {
+  async handler(request, h) {
     let queueStats = null
     let error = null
+    let messages = null
+    let successMessage = null
+
+    // Handle peek action via query parameter
+    const action = request.query.action
+    
+    // Handle success messages from redirects
+    if (request.query.success === 'redrive') {
+      successMessage = `Redrive completed! Processed: ${request.query.processed}, Successful: ${request.query.successful}, Failed: ${request.query.failed}`
+    } else if (request.query.success === 'purge') {
+      successMessage = 'Queue purged successfully!'
+    }
+    
+    // Handle error messages from redirects
+    if (request.query.error) {
+      error = decodeURIComponent(request.query.error)
+    }
 
     try {
       queueStats = await getDeadLetterQueueCount()
+
+      // If peek action is requested, fetch messages
+      if (action === 'peek') {
+        const maxMessages = Number.parseInt(request.query.maxMessages || '5', 10)
+        const result = await getDeadLetterMessages(maxMessages)
+        messages = result
+      }
     } catch (err) {
-      logger.error({ err }, 'Failed to fetch DLQ stats')
+      logger.error({ err }, 'Failed to fetch DLQ data')
       error = err.message
     }
 
@@ -33,29 +57,14 @@ export const deadLetterQueueController = {
         }
       ],
       queueStats,
-      error
+      error,
+      messages,
+      successMessage
     })
   }
 }
 
-export const peekMessagesController = {
-  async handler(request, h) {
-    const maxMessages = Number.parseInt(request.query.maxMessages || '5', 10)
 
-    try {
-      const result = await getDeadLetterMessages(maxMessages)
-      return h.response(result).code(200)
-    } catch (err) {
-      logger.error({ err }, 'Failed to peek DLQ messages')
-      return h
-        .response({
-          error: 'Failed to peek messages',
-          message: err.message
-        })
-        .code(500)
-    }
-  }
-}
 
 export const redriveMessagesController = {
   async handler(request, h) {
@@ -67,15 +76,12 @@ export const redriveMessagesController = {
     try {
       const result = await redriveDeadLetterMessages(maxMessages)
       logger.info({ result }, 'Redrive DLQ messages completed')
-      return h.response(result).code(200)
+      
+      // Redirect back to main page with success message
+      return h.redirect('/system-maintenance/dead-letter-queue?success=redrive&processed=' + result.processedCount + '&successful=' + result.successCount + '&failed=' + result.failureCount)
     } catch (err) {
       logger.error({ err }, 'Failed to redrive DLQ messages')
-      return h
-        .response({
-          error: 'Failed to redrive messages',
-          message: err.message
-        })
-        .code(500)
+      return h.redirect('/system-maintenance/dead-letter-queue?error=' + encodeURIComponent(err.message))
     }
   }
 }
@@ -85,15 +91,10 @@ export const purgeQueueController = {
     try {
       const result = await purgeDeadLetterQueue()
       logger.info({ result }, 'Purge DLQ completed')
-      return h.response(result).code(200)
+      return h.redirect('/system-maintenance/dead-letter-queue?success=purge')
     } catch (err) {
       logger.error({ err }, 'Failed to purge DLQ')
-      return h
-        .response({
-          error: 'Failed to purge queue',
-          message: err.message
-        })
-        .code(500)
+      return h.redirect('/system-maintenance/dead-letter-queue?error=' + encodeURIComponent(err.message))
     }
   }
 }
