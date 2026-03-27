@@ -105,7 +105,7 @@ export const referenceDataController = {
         } else {
           result = await getCountries({
             name: query.name,
-            code: query.code,
+            code: query.code ? query.code.trim().toUpperCase() : undefined,
             devolvedAuthority: query.devolvedAuthority,
             euTradeMember: query.euTradeMember,
             lastUpdatedDate: query.lastUpdatedDate,

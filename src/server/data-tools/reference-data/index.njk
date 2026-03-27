@@ -134,6 +134,7 @@
                 <th class="govuk-table__header">ID</th>
                 <th class="govuk-table__header">First name</th>
                 <th class="govuk-table__header">Last name</th>
+                <th class="govuk-table__header">Email</th>
                 <th class="govuk-table__header">Customer no.</th>
                 <th class="govuk-table__header">Party type</th>
                 <th class="govuk-table__header">State</th>
@@ -146,6 +147,7 @@
                   <td class="govuk-table__cell"><code>{{ p.id }}</code></td>
                   <td class="govuk-table__cell">{{ p.firstName or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.lastName or '—' }}</td>
+                  <td class="govuk-table__cell">{{ p.email or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.customerNumber or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.partyType or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.state or '—' }}</td>

@@ -39,6 +39,17 @@ async function apiGet(path, queryParams = {}) {
   })
 
   if (!response.ok) {
+    // Handle 404 as empty result for list endpoints
+    if (
+      response.status === 404 &&
+      (path.includes('/sites') ||
+        path.includes('/parties') ||
+        path.includes('/countries')) &&
+      !path.match(/\/[^/]+$/)
+    ) {
+      return { values: [], totalCount: 0 }
+    }
+
     const body = await response.text()
     throw new Error(
       `Keeper Data API error ${response.status} for ${path}: ${body}`
