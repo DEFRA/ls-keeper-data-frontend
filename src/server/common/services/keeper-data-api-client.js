@@ -68,7 +68,18 @@ export async function getSiteById(id) {
 }
 
 export async function getParties(params = {}) {
-  return apiGet('/api/parties', params)
+  const result = await apiGet('/api/parties', params)
+  
+  // Map communication array to extract primary contact email
+  if (result.values) {
+    result.values = result.values.map(party => ({
+      ...party,
+      email: party.communication?.find(c => c.primaryContactFlag)?.email || 
+             party.communication?.[0]?.email || null
+    }))
+  }
+  
+  return result
 }
 
 export async function getPartyById(id) {
