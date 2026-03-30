@@ -70,7 +70,7 @@ export const referenceDataController = {
 
     let result = null
     let error = null
-    let validationErrors = {}
+    const validationErrors = {}
 
     // Validate keeper party ID is a valid GUID
     if (activeType === 'sites' && query.keeperPartyId) {
