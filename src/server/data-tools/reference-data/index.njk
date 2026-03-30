@@ -26,6 +26,15 @@
     }) }}
   {% endif %}
 
+  {% if validationErrors.keeperPartyId %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [
+        { text: validationErrors.keeperPartyId, href: "#keeperPartyId" }
+      ]
+    }) }}
+  {% endif %}
+
   <div class="govuk-tabs">
     <ul class="govuk-tabs__list">
       <li class="govuk-tabs__list-item{% if activeType === 'sites' %} govuk-tabs__list-item--selected{% endif %}">
@@ -52,7 +61,14 @@
             {{ govukInput({ label: { text: "Type" }, id: "siteType", name: "siteType", value: filters.siteType, classes: "govuk-input--width-20" }) }}
           </div>
           <div class="govuk-grid-column-one-quarter">
-            {{ govukInput({ label: { text: "Keeper party ID" }, id: "keeperPartyId", name: "keeperPartyId", value: filters.keeperPartyId, classes: "govuk-input--width-20" }) }}
+            {{ govukInput({ 
+              label: { text: "Keeper party ID" }, 
+              id: "keeperPartyId", 
+              name: "keeperPartyId", 
+              value: filters.keeperPartyId, 
+              classes: "govuk-input--width-20",
+              errorMessage: { text: validationErrors.keeperPartyId } if validationErrors.keeperPartyId
+            }) }}
           </div>
           <div class="govuk-grid-column-one-quarter">
             {{ govukInput({ label: { text: "Last updated from" }, id: "lastUpdatedDate", name: "lastUpdatedDate", value: filters.lastUpdatedDate, classes: "govuk-input--width-20", attributes: { placeholder: "2024-01-01" } }) }}

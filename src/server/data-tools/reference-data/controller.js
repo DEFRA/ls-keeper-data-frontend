@@ -9,6 +9,13 @@ const logger = createLogger()
 const VALID_TYPES = ['sites', 'parties', 'countries']
 const DEFAULT_PAGE_SIZE = 10
 
+const GUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function isValidGuid(value) {
+  return !value || GUID_REGEX.test(value.trim())
+}
+
 function buildPageUrl(request, page) {
   const params = new URLSearchParams(request.query)
   params.set('page', page)
@@ -63,6 +70,15 @@ export const referenceDataController = {
 
     let result = null
     let error = null
+    let validationErrors = {}
+
+    // Validate keeper party ID is a valid GUID
+    if (activeType === 'sites' && query.keeperPartyId) {
+      if (!isValidGuid(query.keeperPartyId)) {
+        validationErrors.keeperPartyId =
+          'Keeper party ID must be a valid GUID format (e.g., 550e8400-e29b-41d4-a716-446655440000)'
+      }
+    }
 
     const hasFilters =
       (activeType === 'sites' &&
@@ -82,7 +98,10 @@ export const referenceDataController = {
           query.euTradeMember ||
           query.lastUpdatedDate))
 
-    if (hasFilters || query.page) {
+    if (
+      (hasFilters || query.page) &&
+      Object.keys(validationErrors).length === 0
+    ) {
       try {
         if (activeType === 'sites') {
           result = await getSites({
@@ -134,6 +153,7 @@ export const referenceDataController = {
       activeType,
       result,
       error,
+      validationErrors,
       filters: query,
       page,
       pageSize,
