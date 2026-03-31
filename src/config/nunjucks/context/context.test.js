@@ -72,7 +72,7 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'System Maintenance',
-              href: '/system-maintenance/collections'
+              href: '/system-maintenance'
             },
             {
               current: false,
@@ -181,7 +181,7 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'System Maintenance',
-              href: '/system-maintenance/collections'
+              href: '/system-maintenance'
             },
             {
               current: false,

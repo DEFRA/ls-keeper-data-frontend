@@ -1,6 +1,5 @@
 import {
   deadLetterQueueController,
-  peekMessagesController,
   redriveMessagesController,
   purgeQueueController
 } from './controller.js'
@@ -14,11 +13,6 @@ export const deadLetterQueue = {
           method: 'GET',
           path: '/system-maintenance/dead-letter-queue',
           ...deadLetterQueueController
-        },
-        {
-          method: 'GET',
-          path: '/system-maintenance/dead-letter-queue/peek',
-          ...peekMessagesController
         },
         {
           method: 'POST',

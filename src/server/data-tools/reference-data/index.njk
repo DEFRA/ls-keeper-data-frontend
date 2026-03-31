@@ -26,6 +26,15 @@
     }) }}
   {% endif %}
 
+  {% if validationErrors.keeperPartyId %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [
+        { text: validationErrors.keeperPartyId, href: "#keeperPartyId" }
+      ]
+    }) }}
+  {% endif %}
+
   <div class="govuk-tabs">
     <ul class="govuk-tabs__list">
       <li class="govuk-tabs__list-item{% if activeType === 'sites' %} govuk-tabs__list-item--selected{% endif %}">
@@ -52,7 +61,14 @@
             {{ govukInput({ label: { text: "Type" }, id: "siteType", name: "siteType", value: filters.siteType, classes: "govuk-input--width-20" }) }}
           </div>
           <div class="govuk-grid-column-one-quarter">
-            {{ govukInput({ label: { text: "Keeper party ID" }, id: "keeperPartyId", name: "keeperPartyId", value: filters.keeperPartyId, classes: "govuk-input--width-20" }) }}
+            {{ govukInput({ 
+              label: { text: "Keeper party ID" }, 
+              id: "keeperPartyId", 
+              name: "keeperPartyId", 
+              value: filters.keeperPartyId, 
+              classes: "govuk-input--width-20",
+              errorMessage: { text: validationErrors.keeperPartyId } if validationErrors.keeperPartyId
+            }) }}
           </div>
           <div class="govuk-grid-column-one-quarter">
             {{ govukInput({ label: { text: "Last updated from" }, id: "lastUpdatedDate", name: "lastUpdatedDate", value: filters.lastUpdatedDate, classes: "govuk-input--width-20", attributes: { placeholder: "2024-01-01" } }) }}
@@ -72,9 +88,7 @@
               <tr class="govuk-table__row">
                 <th class="govuk-table__header">ID</th>
                 <th class="govuk-table__header">Name</th>
-                <th class="govuk-table__header">State</th>
                 <th class="govuk-table__header">Type</th>
-                <th class="govuk-table__header">Source</th>
                 <th class="govuk-table__header">Last updated</th>
               </tr>
             </thead>
@@ -83,9 +97,7 @@
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell"><code>{{ s.id }}</code></td>
                   <td class="govuk-table__cell">{{ s.name or '—' }}</td>
-                  <td class="govuk-table__cell">{{ s.state or '—' }}</td>
                   <td class="govuk-table__cell">{{ s.type.code if s.type else '—' }}</td>
-                  <td class="govuk-table__cell">{{ s.source or '—' }}</td>
                   <td class="govuk-table__cell">{{ s.lastUpdatedDate | formatDate('dd MMM yyyy') if s.lastUpdatedDate else '—' }}</td>
                 </tr>
               {% endfor %}
@@ -134,9 +146,9 @@
                 <th class="govuk-table__header">ID</th>
                 <th class="govuk-table__header">First name</th>
                 <th class="govuk-table__header">Last name</th>
+                <th class="govuk-table__header">Email</th>
                 <th class="govuk-table__header">Customer no.</th>
                 <th class="govuk-table__header">Party type</th>
-                <th class="govuk-table__header">State</th>
                 <th class="govuk-table__header">Last updated</th>
               </tr>
             </thead>
@@ -146,9 +158,9 @@
                   <td class="govuk-table__cell"><code>{{ p.id }}</code></td>
                   <td class="govuk-table__cell">{{ p.firstName or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.lastName or '—' }}</td>
+                  <td class="govuk-table__cell">{{ p.email or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.customerNumber or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.partyType or '—' }}</td>
-                  <td class="govuk-table__cell">{{ p.state or '—' }}</td>
                   <td class="govuk-table__cell">{{ p.lastUpdatedDate | formatDate('dd MMM yyyy') if p.lastUpdatedDate else '—' }}</td>
                 </tr>
               {% endfor %}

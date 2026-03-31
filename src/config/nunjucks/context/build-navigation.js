@@ -37,7 +37,7 @@ export function buildNavigation(request) {
     },
     {
       text: 'System Maintenance',
-      href: '/system-maintenance/collections',
+      href: '/system-maintenance',
       current: request?.path?.startsWith('/system-maintenance')
     },
     {

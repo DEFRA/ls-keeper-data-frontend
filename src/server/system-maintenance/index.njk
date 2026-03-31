@@ -1,0 +1,43 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    caption: "Dangerous operations for managing system data"
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          These operations can permanently delete data. Use with extreme caution.
+        </strong>
+      </div>
+
+      <p class="govuk-body">
+        System Maintenance tools allow you to manage and clean up system data. 
+        All destructive operations require explicit confirmation and cannot be undone.
+      </p>
+
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+          <div class="app-card govuk-!-margin-bottom-6" style="border-left: 5px solid #1d70b8; padding: 1.5rem; background: #f3f2f1;">
+            <h2 class="govuk-heading-m">
+              <a href="/system-maintenance/dead-letter-queue" class="govuk-link govuk-link--no-visited-state">
+                Dead Letter Queue
+              </a>
+            </h2>
+            <p class="govuk-body">
+              View, peek, redrive, and purge messages from the dead letter queue.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

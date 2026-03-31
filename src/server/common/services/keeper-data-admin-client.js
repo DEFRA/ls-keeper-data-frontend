@@ -83,7 +83,12 @@ async function adminApiPost(path, queryParams = {}) {
  * @returns {Promise<{approximateNumberOfMessages: number, approximateNumberOfMessagesNotVisible: number}>}
  */
 export async function getDeadLetterQueueCount() {
-  return adminApiGet('/api/admin/queues/deadletter/count')
+  const result = await adminApiGet('/api/admin/queues/deadletter/count')
+  // Map API response to frontend expected format
+  return {
+    approximateNumberOfMessages: result.approximateMessageCount,
+    approximateNumberOfMessagesNotVisible: result.approximateMessagesNotVisible
+  }
 }
 
 /**
@@ -91,8 +96,15 @@ export async function getDeadLetterQueueCount() {
  * @param {number} maxMessages - Maximum number of messages to retrieve (1-10)
  * @returns {Promise<{messages: Array, count: number}>}
  */
-export async function getDeadLetterMessages(maxMessages = 5) {
-  return adminApiGet('/api/admin/queues/deadletter/messages', { maxMessages })
+export async function getDeadLetterMessages(maxMessages = 10) {
+  const result = await adminApiGet('/api/admin/queues/deadletter/peek', {
+    maxMessages
+  })
+  // Map API response to frontend expected format
+  return {
+    messages: result.messages,
+    count: result.totalApproximateCount
+  }
 }
 
 /**
@@ -101,7 +113,18 @@ export async function getDeadLetterMessages(maxMessages = 5) {
  * @returns {Promise<{processedCount: number, successCount: number, failureCount: number}>}
  */
 export async function redriveDeadLetterMessages(maxMessages = 10) {
-  return adminApiPost('/api/admin/queues/deadletter/redrive', { maxMessages })
+  const result = await adminApiPost('/api/admin/queues/deadletter/redrive', {
+    maxMessages
+  })
+  // Map API response to frontend expected format
+  return {
+    processedCount:
+      result.messagesRedriven +
+      result.messagesFailed +
+      result.messagesDuplicated,
+    successCount: result.messagesRedriven,
+    failureCount: result.messagesFailed
+  }
 }
 
 /**
@@ -109,5 +132,12 @@ export async function redriveDeadLetterMessages(maxMessages = 10) {
  * @returns {Promise<{success: boolean, message: string}>}
  */
 export async function purgeDeadLetterQueue() {
-  return adminApiPost('/api/admin/queues/deadletter/purge')
+  const result = await adminApiPost('/api/admin/queues/deadletter/purge')
+  // Map API response to frontend expected format
+  return {
+    success: result.purged,
+    message: result.purged
+      ? `Purged approximately ${result.approximateMessagesPurged} messages`
+      : 'Purge failed'
+  }
 }
