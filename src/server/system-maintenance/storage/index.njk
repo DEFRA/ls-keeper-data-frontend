@@ -1,16 +1,119 @@
 {% extends 'layouts/page.njk' %}
 
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
 {% block content %}
   {{ appHeading({
     text: heading,
     caption: caption
   }) }}
 
+  {% if success %}
+    {{ govukNotificationBanner({
+      type: "success",
+      text: success
+    }) }}
+  {% endif %}
+
+  {% if error %}
+    {{ govukNotificationBanner({
+      titleText: "Error",
+      text: error,
+      classes: "govuk-notification-banner--error"
+    }) }}
+  {% endif %}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
-        <p class="govuk-body">Content coming soon.</p>
+      
+      <p class="govuk-body">
+        Internal S3 storage contains raw source files, staging data, and temporary artifacts
+        used by the data ingestion pipeline. Clearing storage will remove all objects for
+        the selected source type.
+      </p>
+
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          Clearing storage cannot be undone. All files will be permanently deleted from S3.
+        </strong>
       </div>
+
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+      <h2 class="govuk-heading-m">Clear Internal Storage</h2>
+      
+      <p class="govuk-body">
+        Select the source type to clear. This will delete all S3 objects associated with
+        that source, including raw files, staging data, and processing artifacts.
+      </p>
+
+      <form method="POST" action="/system-maintenance/storage/clear" id="clear-storage-form">
+        {{ govukRadios({
+          name: "sourceType",
+          fieldset: {
+            legend: {
+              text: "Source type",
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          hint: {
+            text: "Choose which source type's storage to clear"
+          },
+          items: [
+            {
+              value: "external",
+              text: "External (CTS, SAM, manual uploads)"
+            },
+            {
+              value: "internal",
+              text: "Internal (system-generated data)"
+            },
+            {
+              value: "all",
+              text: "All sources (complete clear-down)"
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Clear storage",
+          classes: "govuk-button--warning",
+          id: "clear-storage-btn"
+        }) }}
+      </form>
+
     </div>
   </div>
+
+  <script nonce="{{ cspNonce }}">
+    (function() {
+      const form = document.getElementById('clear-storage-form');
+      const btn = document.getElementById('clear-storage-btn');
+
+      if (form && btn) {
+        form.addEventListener('submit', function(e) {
+          const selectedRadio = form.querySelector('input[name="sourceType"]:checked');
+          const sourceType = selectedRadio ? selectedRadio.value : 'unknown';
+          
+          const confirmed = confirm(
+            `Are you sure you want to clear storage for source type "${sourceType}"?\n\n` +
+            'This will permanently delete:\n' +
+            '- All raw source files\n' +
+            '- All staging and temporary data\n' +
+            '- All processing artifacts\n\n' +
+            'This action CANNOT be undone.\n\n' +
+            'Click OK to proceed or Cancel to abort.'
+          );
+
+          if (!confirmed) {
+            e.preventDefault();
+          }
+        });
+      }
+    })();
+  </script>
 {% endblock %}

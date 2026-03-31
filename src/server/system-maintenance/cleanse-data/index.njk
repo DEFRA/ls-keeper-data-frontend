@@ -1,16 +1,146 @@
 {% extends 'layouts/page.njk' %}
 
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
 {% block content %}
   {{ appHeading({
     text: heading,
     caption: caption
   }) }}
 
+  {% if success %}
+    {{ govukNotificationBanner({
+      type: "success",
+      text: success
+    }) }}
+  {% endif %}
+
+  {% if error %}
+    {{ govukNotificationBanner({
+      titleText: "Error",
+      text: error,
+      classes: "govuk-notification-banner--error"
+    }) }}
+  {% endif %}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
-        <p class="govuk-body">Content coming soon.</p>
+      
+      <p class="govuk-body">
+        Data quality cleanse operations produce analysis results, issue reports, and operational metadata.
+        Use these tools to delete cleanse data and metadata when resetting test environments or
+        clearing stale analysis results.
+      </p>
+
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          Deleting cleanse data and metadata cannot be undone.
+        </strong>
       </div>
+
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+      <h2 class="govuk-heading-m">Delete Cleanse Data</h2>
+      
+      <p class="govuk-body">
+        Cleanse data includes:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>Analysis results and findings</li>
+        <li>Issue records and resolution history</li>
+        <li>Validation reports and audit trails</li>
+      </ul>
+
+      <p class="govuk-body">
+        Deleting cleanse data will remove all analysis results but preserve the metadata
+        about when and how analyses were run.
+      </p>
+
+      <form method="POST" action="/system-maintenance/cleanse-data/delete-data" id="delete-data-form">
+        {{ govukButton({
+          text: "Delete cleanse data",
+          classes: "govuk-button--warning",
+          id: "delete-data-btn"
+        }) }}
+      </form>
+
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+      <h2 class="govuk-heading-m">Delete Cleanse Metadata</h2>
+      
+      <p class="govuk-body">
+        Cleanse metadata includes:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>Analysis run history and timestamps</li>
+        <li>Configuration and parameter settings</li>
+        <li>Operational logs and execution traces</li>
+      </ul>
+
+      <p class="govuk-body">
+        Deleting cleanse metadata will remove all operational tracking data about past
+        analysis runs. This is typically done when completely resetting the cleanse system.
+      </p>
+
+      <form method="POST" action="/system-maintenance/cleanse-data/delete-metadata" id="delete-metadata-form">
+        {{ govukButton({
+          text: "Delete cleanse metadata",
+          classes: "govuk-button--warning",
+          id: "delete-metadata-btn"
+        }) }}
+      </form>
+
     </div>
   </div>
+
+  <script nonce="{{ cspNonce }}">
+    (function() {
+      const deleteDataForm = document.getElementById('delete-data-form');
+      const deleteDataBtn = document.getElementById('delete-data-btn');
+
+      if (deleteDataForm && deleteDataBtn) {
+        deleteDataForm.addEventListener('submit', function(e) {
+          const confirmed = confirm(
+            'Are you sure you want to delete all cleanse data?\n\n' +
+            'This will permanently delete:\n' +
+            '- All analysis results and findings\n' +
+            '- All issue records and resolution history\n' +
+            '- All validation reports and audit trails\n\n' +
+            'This action CANNOT be undone.\n\n' +
+            'Click OK to proceed or Cancel to abort.'
+          );
+
+          if (!confirmed) {
+            e.preventDefault();
+          }
+        });
+      }
+
+      const deleteMetadataForm = document.getElementById('delete-metadata-form');
+      const deleteMetadataBtn = document.getElementById('delete-metadata-btn');
+
+      if (deleteMetadataForm && deleteMetadataBtn) {
+        deleteMetadataForm.addEventListener('submit', function(e) {
+          const confirmed = confirm(
+            'Are you sure you want to delete all cleanse metadata?\n\n' +
+            'This will permanently delete:\n' +
+            '- All analysis run history and timestamps\n' +
+            '- All configuration and parameter settings\n' +
+            '- All operational logs and execution traces\n\n' +
+            'This action CANNOT be undone.\n\n' +
+            'Click OK to proceed or Cancel to abort.'
+          );
+
+          if (!confirmed) {
+            e.preventDefault();
+          }
+        });
+      }
+    })();
+  </script>
 {% endblock %}

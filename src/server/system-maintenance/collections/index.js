@@ -1,4 +1,8 @@
-import { collectionsController } from './controller.js'
+import {
+  collectionsController,
+  deleteCollectionController,
+  deleteAllCollectionsController
+} from './controller.js'
 
 export const collections = {
   plugin: {
@@ -9,6 +13,16 @@ export const collections = {
           method: 'GET',
           path: '/system-maintenance/collections',
           ...collectionsController
+        },
+        {
+          method: 'POST',
+          path: '/system-maintenance/collections/delete',
+          ...deleteCollectionController
+        },
+        {
+          method: 'POST',
+          path: '/system-maintenance/collections/delete-all',
+          ...deleteAllCollectionsController
         }
       ])
     }

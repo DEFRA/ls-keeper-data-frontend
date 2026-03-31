@@ -1,4 +1,8 @@
-import { reportingCollectionsController } from './controller.js'
+import {
+  reportingCollectionsController,
+  deleteReportingCollectionController,
+  deleteAllReportingCollectionsController
+} from './controller.js'
 
 export const reportingCollections = {
   plugin: {
@@ -9,6 +13,16 @@ export const reportingCollections = {
           method: 'GET',
           path: '/system-maintenance/reporting-collections',
           ...reportingCollectionsController
+        },
+        {
+          method: 'POST',
+          path: '/system-maintenance/reporting-collections/delete',
+          ...deleteReportingCollectionController
+        },
+        {
+          method: 'POST',
+          path: '/system-maintenance/reporting-collections/delete-all',
+          ...deleteAllReportingCollectionsController
         }
       ])
     }

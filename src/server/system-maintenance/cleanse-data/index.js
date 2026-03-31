@@ -1,4 +1,8 @@
-import { cleanseDataController } from './controller.js'
+import {
+  cleanseDataController,
+  deleteCleanseDataController,
+  deleteCleanseMetadataController
+} from './controller.js'
 
 export const cleanseData = {
   plugin: {
@@ -9,6 +13,16 @@ export const cleanseData = {
           method: 'GET',
           path: '/system-maintenance/cleanse-data',
           ...cleanseDataController
+        },
+        {
+          method: 'POST',
+          path: '/system-maintenance/cleanse-data/delete-data',
+          ...deleteCleanseDataController
+        },
+        {
+          method: 'POST',
+          path: '/system-maintenance/cleanse-data/delete-metadata',
+          ...deleteCleanseMetadataController
         }
       ])
     }

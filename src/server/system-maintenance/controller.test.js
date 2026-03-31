@@ -48,5 +48,9 @@ describe('#systemMaintenanceController', () => {
     })
 
     expect(result).toEqual(expect.stringContaining('Dead Letter Queue'))
+    expect(result).toEqual(expect.stringContaining('Collections'))
+    expect(result).toEqual(expect.stringContaining('Reporting Collections'))
+    expect(result).toEqual(expect.stringContaining('Storage'))
+    expect(result).toEqual(expect.stringContaining('Cleanse Data'))
   })
 })
