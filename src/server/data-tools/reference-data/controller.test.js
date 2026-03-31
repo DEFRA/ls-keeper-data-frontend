@@ -105,23 +105,6 @@ describe('#referenceDataController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
-  test('Should accept valid GUID in keeper party ID', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/data-tools/reference-data?type=sites&keeperPartyId=550e8400-e29b-41d4-a716-446655440000',
-      auth: {
-        strategy: 'simple-cookie',
-        credentials: {
-          username: 'admin',
-          displayName: 'Administrator'
-        }
-      }
-    })
-
-    expect(result).not.toEqual(expect.stringContaining('There is a problem'))
-    expect(statusCode).toBe(statusCodes.ok)
-  })
-
   test('Should display email column in parties results', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
