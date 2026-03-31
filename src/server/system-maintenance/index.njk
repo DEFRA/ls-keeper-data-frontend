@@ -32,12 +32,69 @@
                 Dead Letter Queue
               </a>
             </h2>
-            <p class="govuk-body">
+            <p class="govuk-body govuk-!-margin-bottom-0">
               View, peek, redrive, and purge messages from the dead letter queue.
             </p>
           </div>
         </div>
+
+        <div class="govuk-grid-column-one-half">
+          <div class="app-card govuk-!-margin-bottom-6" style="border-left: 5px solid #d4351c; padding: 1.5rem; background: #f3f2f1;">
+            <h2 class="govuk-heading-m">
+              <a href="/system-maintenance/collections" class="govuk-link govuk-link--no-visited-state">
+                Collections
+              </a>
+            </h2>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              Drop specific or all MongoDB data collections.
+            </p>
+          </div>
+        </div>
       </div>
+
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+          <div class="app-card govuk-!-margin-bottom-6" style="border-left: 5px solid #d4351c; padding: 1.5rem; background: #f3f2f1;">
+            <h2 class="govuk-heading-m">
+              <a href="/system-maintenance/reporting-collections" class="govuk-link govuk-link--no-visited-state">
+                Reporting Collections
+              </a>
+            </h2>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              Drop specific or all reporting and lineage collections.
+            </p>
+          </div>
+        </div>
+
+        <div class="govuk-grid-column-one-half">
+          <div class="app-card govuk-!-margin-bottom-6" style="border-left: 5px solid #d4351c; padding: 1.5rem; background: #f3f2f1;">
+            <h2 class="govuk-heading-m">
+              <a href="/system-maintenance/storage" class="govuk-link govuk-link--no-visited-state">
+                Storage
+              </a>
+            </h2>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              Clear down internal S3 storage buckets.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+          <div class="app-card govuk-!-margin-bottom-6" style="border-left: 5px solid #d4351c; padding: 1.5rem; background: #f3f2f1;">
+            <h2 class="govuk-heading-m">
+              <a href="/system-maintenance/cleanse-data" class="govuk-link govuk-link--no-visited-state">
+                Cleanse Data
+              </a>
+            </h2>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              Delete cleanse data and metadata from the system.
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 {% endblock %}

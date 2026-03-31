@@ -1,4 +1,4 @@
-import { storageController } from './controller.js'
+import { storageController, clearStorageController } from './controller.js'
 
 export const storage = {
   plugin: {
@@ -9,6 +9,11 @@ export const storage = {
           method: 'GET',
           path: '/system-maintenance/storage',
           ...storageController
+        },
+        {
+          method: 'POST',
+          path: '/system-maintenance/storage/clear',
+          ...clearStorageController
         }
       ])
     }

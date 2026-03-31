@@ -1,16 +1,134 @@
 {% extends 'layouts/page.njk' %}
 
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
 {% block content %}
   {{ appHeading({
     text: heading,
     caption: caption
   }) }}
 
+  {% if success %}
+    {{ govukNotificationBanner({
+      type: "success",
+      text: success
+    }) }}
+  {% endif %}
+
+  {% if error %}
+    {{ govukNotificationBanner({
+      titleText: "Error",
+      text: error,
+      classes: "govuk-notification-banner--error"
+    }) }}
+  {% endif %}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
-        <p class="govuk-body">Content coming soon.</p>
+      
+      <p class="govuk-body">
+        MongoDB collections contain all reference data, import history, and operational state. 
+        Use these tools to drop specific collections or clear all data for testing purposes.
+      </p>
+
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          Deleting collections cannot be undone. All data will be permanently lost.
+        </strong>
       </div>
+
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+      <h2 class="govuk-heading-m">Drop Specific Collection</h2>
+      
+      <p class="govuk-body">
+        Delete a single named collection. Common collection names include:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li><code>sites</code> - Site reference data</li>
+        <li><code>parties</code> - Party (keeper) reference data</li>
+        <li><code>countries</code> - Country reference data</li>
+        <li><code>imports</code> - Import history and metadata</li>
+      </ul>
+
+      <form method="POST" action="/system-maintenance/collections/delete">
+        {{ govukInput({
+          label: {
+            text: "Collection name",
+            classes: "govuk-label--s"
+          },
+          hint: {
+            text: "Enter the exact name of the collection to drop"
+          },
+          id: "collectionName",
+          name: "collectionName"
+        }) }}
+
+        {{ govukButton({
+          text: "Drop collection",
+          classes: "govuk-button--warning"
+        }) }}
+      </form>
+
+      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          Extreme Danger Zone
+        </strong>
+      </div>
+
+      <h2 class="govuk-heading-m">Drop All Collections</h2>
+      
+      <p class="govuk-body">
+        This will permanently delete <strong>all MongoDB collections</strong> in the database.
+        This operation removes all reference data, import history, and system state.
+      </p>
+
+      <p class="govuk-body">
+        <strong>This action cannot be undone.</strong> Only use this in development or test environments.
+      </p>
+
+      <form method="POST" action="/system-maintenance/collections/delete-all" id="delete-all-form">
+        {{ govukButton({
+          text: "Drop all collections",
+          classes: "govuk-button--warning",
+          id: "delete-all-btn"
+        }) }}
+      </form>
+
     </div>
   </div>
+
+  <script nonce="{{ cspNonce }}">
+    (function() {
+      const deleteAllForm = document.getElementById('delete-all-form');
+      const deleteAllBtn = document.getElementById('delete-all-btn');
+
+      if (deleteAllForm && deleteAllBtn) {
+        deleteAllForm.addEventListener('submit', function(e) {
+          const confirmed = confirm(
+            'Are you absolutely sure you want to delete ALL collections?\n\n' +
+            'This will permanently delete:\n' +
+            '- All reference data (sites, parties, countries)\n' +
+            '- All import history and metadata\n' +
+            '- All operational state\n\n' +
+            'This action CANNOT be undone.\n\n' +
+            'Click OK to proceed or Cancel to abort.'
+          );
+
+          if (!confirmed) {
+            e.preventDefault();
+          }
+        });
+      }
+    })();
+  </script>
 {% endblock %}

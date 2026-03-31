@@ -54,15 +54,6 @@ export const validateCredentials = (username, password) => {
   const expectedUsername = authConfig.username
   const expectedPassword = authConfig.password
 
-  // Debug logging to see what credentials are being compared
-  console.log('🔐 Auth Debug:', {
-    providedUsername: username,
-    providedPassword: password,
-    expectedUsername,
-    expectedPassword,
-    match: username === expectedUsername && password === expectedPassword
-  })
-
   // Simple string comparison (consider adding timing-safe comparison for production)
   if (username === expectedUsername && password === expectedPassword) {
     return {
